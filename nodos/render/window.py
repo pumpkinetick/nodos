@@ -21,14 +21,10 @@ class Window(arcade.Window):
 
         arcade.set_background_color(arcade.color.CHARCOAL)
 
-        self.world_map = WorldMap(width=100, height=100)
+        self.world_map = WorldMap()
 
         self.camera_controller = CameraController()
-        self.layout = HexLayout(
-            size=32.0,
-            origin_x=0.0,
-            origin_y=0.0
-        )
+        self.layout = HexLayout()
         self.drawer = HexBatchDrawer(layout=self.layout)
         self.drawer.build_geometry(world_map=self.world_map)
 
