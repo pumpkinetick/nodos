@@ -22,6 +22,11 @@ class Hex:
     def __repr__(self) -> str:
         return f'Hex(q={self.q}, r={self.r})'
 
+    def distance_to(self,
+                    other: 'Hex'
+                    ) -> int:
+        return (abs(self.q - other.q) + abs(self.r - other.r) + abs(self.s - other.s)) // 2
+
 
 class HexLayout:
     def __init__(self,

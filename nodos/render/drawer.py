@@ -1,4 +1,4 @@
-import arcade
+from arcade.shape_list import ShapeElementList, create_polygon, create_line_strip
 
 from nodos.core.hex_math import HexLayout
 from nodos.world.map import WorldMap
@@ -10,32 +10,52 @@ class HexBatchDrawer:
                  ):
         self.layout = layout
 
-        self.shape_list = arcade.shape_list.ShapeElementList()
+        self.terrain_shapes = ShapeElementList()
+        self.district_shapes = ShapeElementList()
 
     def build_geometry(self,
                        world_map: WorldMap
                        ):
-        self.shape_list = arcade.shape_list.ShapeElementList()
+        self.terrain_shapes = ShapeElementList()
+        self.district_shapes = ShapeElementList()
 
         for hex_obj, tile in world_map.tiles.items():
             corners = self.layout.polygon_corners(hex_obj=hex_obj)
 
-            fill_color = tile.color
-            border_color = (max(0, fill_color[0] - 20),
-                            max(0, fill_color[1] - 20),
-                            max(0, fill_color[2] - 20),
+            t_fill = tile.color
+            t_border = (max(0, t_fill[0] - 20),
+                        max(0, t_fill[1] - 20),
+                        max(0, t_fill[2] - 20),
+                        255)
+
+            self.terrain_shapes.append(create_polygon(
+                point_list=corners, color=t_fill
+            ))
+            self.terrain_shapes.append(create_line_strip(
+                point_list=corners + [corners[0]], color=t_border
+            ))
+
+            if tile.district_color:
+                d_fill = tile.district_color
+                d_border = (max(0, d_fill[0] - 30),
+                            max(0, d_fill[1] - 30),
+                            max(0, d_fill[2] - 30),
                             255)
+            else:
+                d_fill = (t_fill[0] // 2, t_fill[1] // 2, t_fill[2] // 2, 255)
+                d_border = d_fill
 
-            fill_shape = arcade.shape_list.create_polygon(
-                point_list=corners, color=fill_color
-            )
-            self.shape_list.append(fill_shape)
+            self.district_shapes.append(create_polygon(
+                point_list=corners, color=d_fill
+            ))
+            self.district_shapes.append(create_line_strip(
+                point_list=corners + [corners[0]], color=d_border
+            ))
 
-            closed_corners = corners + [corners[0]]
-            outline_shape = arcade.shape_list.create_line_strip(
-                point_list=closed_corners, color=border_color
-            )
-            self.shape_list.append(outline_shape)
-
-    def draw_world_map(self):
-        self.shape_list.draw()
+    def draw_layer(self,
+                   view_mode: str
+                   ):
+        if view_mode == 'terrain':
+            self.terrain_shapes.draw()
+        elif view_mode == 'districts':
+            self.district_shapes.draw()

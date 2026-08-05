@@ -1,9 +1,11 @@
 from functools import cached_property
+from typing import Optional
 
 from nodos.core.hex_math import Hex
 from nodos.world.terrain import TerrainGenerator
 
 from nodos.config import MAP_WIDTH, MAP_HEIGHT
+from nodos.world.zones import ZonePartitionEngine
 
 
 class HexTile:
@@ -17,6 +19,9 @@ class HexTile:
         self.color: tuple[int, int, int, int] = (0, 0, 0, 255)
         self.is_buildable: bool = False
 
+        self.district_id: Optional[str] = None
+        self.district_color: Optional[tuple[int, int, int, int]] = None
+
     def __repr__(self):
         return f'HexTile({self.hex_obj.q}, {self.hex_obj.r})'
 
@@ -29,6 +34,9 @@ class WorldMap:
         self.height = height
 
         self.terrain_gen = TerrainGenerator()
+        self.zone_engine = ZonePartitionEngine()
+
+        self.districts = self.zone_engine.generate_districts(tiles=self.tiles)
 
     @cached_property
     def tiles(self) -> dict[Hex, HexTile]:

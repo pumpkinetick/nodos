@@ -30,10 +30,12 @@ class Window(arcade.Window):
 
         self.active_keys = set()
 
+        self.view_mode = 'terrain'
+
     def on_draw(self):
         self.clear()
         self.camera_controller.use_world()
-        self.drawer.draw_world_map()
+        self.drawer.draw_layer(view_mode=self.view_mode)
 
     def on_update(self,
                   delta_time: float
@@ -53,6 +55,9 @@ class Window(arcade.Window):
                      modifiers: int
                      ):
         self.active_keys.add(symbol)
+
+        if symbol == arcade.key.Z:
+            self.view_mode = 'districts' if self.view_mode == 'terrain' else 'terrain'
 
     def on_key_release(self,
                        symbol: int,

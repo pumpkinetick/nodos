@@ -29,3 +29,12 @@ BIOMES = [
     (0.5, (110, 110, 110, 255), False, 'mountains'),
     (float('inf'), (220, 225, 230, 255), False, 'snow')
 ]
+
+# --- Districts & Zoning ---
+DISTRICT_COUNT = 8
+ZONE_TYPES = ['residential', 'industrial', 'commercial']
+ZONE_COLORS = {
+    'residential': (220, 180, 50, 255),
+    'industrial': (70, 130, 200, 255),
+    'commercial': (210, 80, 80, 255)
+}
