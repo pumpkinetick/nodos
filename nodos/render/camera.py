@@ -6,6 +6,8 @@ class CameraController:
         self.world_camera = arcade.Camera2D()
         self.base_pan_speed = 400.0
 
+        self.min_zoom = 0.1
+        self.max_zoom = 3.0
         self.target_zoom = 1.0
         self.zoom_speed = 8.0
 
@@ -40,4 +42,4 @@ class CameraController:
                            scroll_y: float
                            ):
         zoom_factor = 1.15 if scroll_y > 0 else (1.0 / 1.15)
-        self.target_zoom = max(0.5, min(self.target_zoom * zoom_factor, 3.0))
+        self.target_zoom = max(self.min_zoom, min(self.target_zoom * zoom_factor, self.max_zoom))
