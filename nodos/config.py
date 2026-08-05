@@ -5,8 +5,8 @@ WINDOW_TITLE = 'Nodos'
 
 # --- Hex Layout ---
 HEX_SIZE = 32.0
-ORIGIN_X = 100.0
-ORIGIN_Y = 100.0
+ORIGIN_X = 0.0
+ORIGIN_Y = 0.0
 MAP_WIDTH = 160
 MAP_HEIGHT = 90
 
