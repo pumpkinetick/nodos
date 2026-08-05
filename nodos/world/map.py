@@ -3,6 +3,8 @@ from functools import cached_property
 from nodos.core.hex_math import Hex
 from nodos.world.terrain import TerrainGenerator
 
+from nodos.config import MAP_WIDTH, MAP_HEIGHT
+
 
 class HexTile:
     def __init__(self,
@@ -12,7 +14,7 @@ class HexTile:
 
         self.elevation: float = 0.0
         self.biome: str = 'water'
-        self.color: tuple[int, int, int] = (0, 0, 0)
+        self.color: tuple[int, int, int, int] = (0, 0, 0, 255)
         self.is_buildable: bool = False
 
     def __repr__(self):
@@ -20,20 +22,13 @@ class HexTile:
 
 class WorldMap:
     def __init__(self,
-                 width: int,
-                 height: int,
-                 seed: int = 42
+                 width: int = MAP_WIDTH,
+                 height: int = MAP_HEIGHT
                  ):
         self.width = width
         self.height = height
 
-        self.terrain_gen = TerrainGenerator(
-            seed=seed,
-            scale=1,
-            octaves=3,
-            persistence=0.5,
-            lacunarity=2.0
-        )
+        self.terrain_gen = TerrainGenerator()
 
     @cached_property
     def tiles(self) -> dict[Hex, HexTile]:
@@ -46,7 +41,7 @@ class WorldMap:
                 tile = HexTile(hex_obj=hex_obj)
 
                 tile.elevation = self.terrain_gen.get_elevation(q=q, r=r)
-                tile.biome, (tile.color, tile.is_buildable) = self.terrain_gen.get_biome_data(
+                tile.biome, tile.color, tile.is_buildable = self.terrain_gen.get_biome_data(
                     elevation=tile.elevation
                 )
 

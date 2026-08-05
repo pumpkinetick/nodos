@@ -1,6 +1,8 @@
 import math
 from functools import cached_property
 
+from nodos.config import HEX_SIZE, ORIGIN_X, ORIGIN_Y
+
 
 class Hex:
     def __init__(self,
@@ -23,9 +25,9 @@ class Hex:
 
 class HexLayout:
     def __init__(self,
-                 size: float,
-                 origin_x: float,
-                 origin_y: float
+                 size: float = HEX_SIZE,
+                 origin_x: float = ORIGIN_X,
+                 origin_y: float = ORIGIN_Y
                  ):
         self.size = size
         self.origin_x = origin_x

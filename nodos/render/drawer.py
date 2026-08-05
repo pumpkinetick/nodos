@@ -23,7 +23,8 @@ class HexBatchDrawer:
             fill_color = tile.color
             border_color = (max(0, fill_color[0] - 20),
                             max(0, fill_color[1] - 20),
-                            max(0, fill_color[2] - 20))
+                            max(0, fill_color[2] - 20),
+                            255)
 
             fill_shape = arcade.shape_list.create_polygon(
                 point_list=corners, color=fill_color
