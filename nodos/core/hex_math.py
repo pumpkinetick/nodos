@@ -1,0 +1,84 @@
+import math
+from functools import cached_property
+
+
+class Hex:
+    def __init__(self,
+                 q: int,
+                 r: int
+                 ):
+        self.q = q
+        self.r = r
+
+    @cached_property
+    def s(self) -> int:
+        return -self.q - self.r
+
+    def __hash__(self) -> int:
+        return hash((self.q, self.r))
+
+    def __repr__(self) -> str:
+        return f'Hex(q={self.q}, r={self.r})'
+
+
+class HexLayout:
+    def __init__(self,
+                 size: float,
+                 origin_x: float,
+                 origin_y: float
+                 ):
+        self.size = size
+        self.origin_x = origin_x
+        self.origin_y = origin_y
+
+    def hex_to_pixel(self,
+                     hex_obj: Hex
+                     ) -> tuple[float, float]:
+        x = self.size * (math.sqrt(3) * hex_obj.q + math.sqrt(3) / 2.0 * hex_obj.r) + self.origin_x
+        y = self.size * (3.0 / 2.0 * hex_obj.r) + self.origin_y
+        return x, y
+
+    def polygon_corners(self,
+                        hex_obj: Hex
+                        ) -> list[tuple[float, float]]:
+        center_x, center_y = self.hex_to_pixel(hex_obj=hex_obj)
+        corners = list()
+        for i in range(6):
+            angle_rad = math.pi / 180.0 * (60 * i + 30)
+            x = center_x + self.size * math.cos(angle_rad)
+            y = center_y + self.size * math.sin(angle_rad)
+            corners.append((x, y))
+        return corners
+
+    def pixel_to_hex(self,
+                     x: float,
+                     y: float
+                     ) -> Hex:
+        norm_x = (x - self.origin_x) / self.size
+        norm_y = (y - self.origin_y) / self.size
+
+        q = math.sqrt(3) / 3.0 * norm_x - 1.0 / 3.0 * norm_y
+        r = 2.0 / 3.0 * norm_y
+        s = -q - r
+
+        return self._cube_round(q=q, r=r, s=s)
+
+    @staticmethod
+    def _cube_round(q: float,
+                    r: float,
+                    s: float
+                    ) -> Hex:
+        rounded_q = round(q)
+        rounded_r = round(r)
+        rounded_s = round(s)
+
+        q_diff = abs(rounded_q - q)
+        r_diff = abs(rounded_r - r)
+        s_diff = abs(rounded_s - s)
+
+        if q_diff > max(r_diff, s_diff):
+            rounded_q = -rounded_r - rounded_s
+        elif r_diff > s_diff:
+            rounded_r = -rounded_q - rounded_s
+
+        return Hex(q=rounded_q, r=rounded_r)
