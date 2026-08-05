@@ -21,6 +21,8 @@ class Window(arcade.Window):
 
         arcade.set_background_color(arcade.color.CHARCOAL)
 
+        self.world_map = WorldMap(width=100, height=100)
+
         self.camera_controller = CameraController()
         self.layout = HexLayout(
             size=32.0,
@@ -28,15 +30,14 @@ class Window(arcade.Window):
             origin_y=0.0
         )
         self.drawer = HexBatchDrawer(layout=self.layout)
-
-        self.world_map = WorldMap(width=10, height=10)
+        self.drawer.build_geometry(world_map=self.world_map)
 
         self.active_keys = set()
 
     def on_draw(self):
         self.clear()
         self.camera_controller.use_world()
-        self.drawer.draw_world_map(world_map=self.world_map)
+        self.drawer.draw_world_map()
 
     def on_update(self,
                   delta_time: float

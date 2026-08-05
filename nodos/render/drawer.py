@@ -10,9 +10,13 @@ class HexBatchDrawer:
                  ):
         self.layout = layout
 
-    def draw_world_map(self,
+        self.shape_list = arcade.shape_list.ShapeElementList()
+
+    def build_geometry(self,
                        world_map: WorldMap
                        ):
+        self.shape_list = arcade.shape_list.ShapeElementList()
+
         for hex_obj, tile in world_map.tiles.items():
             corners = self.layout.polygon_corners(hex_obj=hex_obj)
 
@@ -21,5 +25,16 @@ class HexBatchDrawer:
                             max(0, fill_color[1] - 20),
                             max(0, fill_color[2] - 20))
 
-            arcade.draw_polygon_filled(point_list=corners, color=fill_color)
-            arcade.draw_polygon_outline(point_list=corners, color=border_color)
+            fill_shape = arcade.shape_list.create_polygon(
+                point_list=corners, color=fill_color
+            )
+            self.shape_list.append(fill_shape)
+
+            closed_corners = corners + [corners[0]]
+            outline_shape = arcade.shape_list.create_line_strip(
+                point_list=closed_corners, color=border_color
+            )
+            self.shape_list.append(outline_shape)
+
+    def draw_world_map(self):
+        self.shape_list.draw()
