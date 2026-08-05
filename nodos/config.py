@@ -1,3 +1,5 @@
+HEX_DIRECTIONS = [(1, 0), (1, -1), (0, -1), (-1, 0), (-1, 1), (0, 1)]
+
 # --- Window & Display ---
 SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 800
@@ -31,9 +33,11 @@ BIOMES = [
 ]
 
 # --- Districts & Zoning ---
-DISTRICT_COUNT = 8
+NUM_CITIES = 6
+CITY_EXPANSION_STEPS = 10
 ZONE_TYPES = ['residential', 'industrial', 'commercial']
 ZONE_COLORS = {
+    'center': (255, 255, 255, 255),
     'residential': (220, 180, 50, 255),
     'industrial': (70, 130, 200, 255),
     'commercial': (210, 80, 80, 255)

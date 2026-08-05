@@ -16,6 +16,13 @@ class Hex:
     def s(self) -> int:
         return -self.q - self.r
 
+    def __eq__(self,
+               other: object
+               ) -> bool:
+        if not isinstance(other, Hex):
+            return False
+        return self.q == other.q and self.r == other.r
+
     def __hash__(self) -> int:
         return hash((self.q, self.r))
 

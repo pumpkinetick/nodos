@@ -35,8 +35,8 @@ class HexBatchDrawer:
                 point_list=corners + [corners[0]], color=t_border
             ))
 
-            if tile.district_color:
-                d_fill = tile.district_color
+            if tile.zone_color:
+                d_fill = tile.zone_color
                 d_border = (max(0, d_fill[0] - 30),
                             max(0, d_fill[1] - 30),
                             max(0, d_fill[2] - 30),

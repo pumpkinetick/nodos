@@ -2,47 +2,70 @@ import random
 
 from nodos.core.hex_math import Hex
 
-from nodos.config import DISTRICT_COUNT, ZONE_TYPES, ZONE_COLORS
+from nodos.config import NUM_CITIES, CITY_EXPANSION_STEPS, ZONE_TYPES, ZONE_COLORS, HEX_DIRECTIONS
 
 
-class District:
+class City:
     def __init__(self,
                  id_num: int,
-                 center: Hex,
-                 zone_type: str
+                 center: Hex
                  ):
         self.id_num = id_num
         self.center = center
-        self.zone_type = zone_type
 
-        self.color = ZONE_COLORS[zone_type]
-        self.hexes: list[Hex] = list()
+        self.districts: dict[Hex, str] = {center: 'center'}
 
-class ZonePartitionEngine:
+
+class CityBuilderEngine:
     @staticmethod
-    def generate_districts(tiles: dict) -> list[District]:
+    def generate_cities(tiles: dict
+                        ) -> list[City]:
         buildable_hexes = [h for h, t in tiles.items() if t.is_buildable]
 
-        num_seeds = min(DISTRICT_COUNT, len(buildable_hexes))
+        num_seeds = min(NUM_CITIES, len(buildable_hexes))
         if num_seeds == 0:
             return list()
 
         seed_hexes = random.sample(buildable_hexes, k=num_seeds)
 
-        districts = list()
+        cities = list()
         for i, center_hex in enumerate(seed_hexes, start=1):
-            zone_type = random.choice(ZONE_TYPES)
-            districts.append(District(
+            city = City(
                 id_num=i,
-                center=center_hex,
-                zone_type=zone_type
-            ))
+                center=center_hex
+            )
 
-        for hex_obj in buildable_hexes:
-            closest_district = min(districts, key=lambda d: hex_obj.distance_to(d.center))
-            closest_district.hexes.append(hex_obj)
+            frontier = [center_hex]
+            visited = {center_hex}
 
-            tiles[hex_obj].district_id = closest_district.id_num
-            tiles[hex_obj].district_color = closest_district.color
+            tiles[center_hex].city_id = city.id_num
+            tiles[center_hex].zone_type = 'center'
+            tiles[center_hex].zone_color = ZONE_COLORS['center']
 
-        return districts
+            for _ in range(CITY_EXPANSION_STEPS):
+                next_frontier = list()
+                for current_hex in frontier:
+                    for dq, dr in HEX_DIRECTIONS:
+                        neighbor = Hex(q=current_hex.q + dq, r=current_hex.r + dr)
+
+                        if (
+                            neighbor in tiles and
+                            tiles[neighbor].is_buildable and
+                            neighbor not in visited
+                        ):
+                            if tiles[neighbor].city_id is None:
+                                visited.add(neighbor)
+                                next_frontier.append(neighbor)
+
+                                zone_type = random.choice(ZONE_TYPES)
+                                city.districts[neighbor] = zone_type
+
+                                tiles[neighbor].city_id = city.id_num
+                                tiles[neighbor].zone_type = zone_type
+                                tiles[neighbor].zone_color = ZONE_COLORS[zone_type]
+
+                frontier = next_frontier
+
+            cities.append(city)
+
+        return cities
