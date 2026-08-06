@@ -1,4 +1,9 @@
-HEX_DIRECTIONS = [(1, 0), (1, -1), (0, -1), (-1, 0), (-1, 1), (0, 1)]
+HEX_DIRECTIONS = [
+    (1, 0), (1, -1), (0, -1), (-1, 0), (-1, 1), (0, 1)
+]
+POINTY_TOP_DIRECTIONS = [
+    (0, 1), (-1, 1), (-1, 0), (0, -1), (1, -1), (1, 0)
+]
 
 # --- Window & Display ---
 SCREEN_WIDTH = 1200
@@ -33,7 +38,7 @@ BIOMES = [
 ]
 
 # --- Cities & Zoning ---
-INIT_NUM_CITIES = 20
+INIT_NUM_CITIES = 100
 MIN_CITY_DISTANCE = 12
 CITY_EXPANSION_STEPS = 3
 ZONE_COLORS = {
@@ -42,3 +47,5 @@ ZONE_COLORS = {
     'industrial': (220, 180, 50, 255),
     'commercial': (210, 80, 80, 255)
 }
+NAME_PREFIXES = ['Oak', 'River', 'Stone', 'Iron', 'Kings', 'Frost', 'Sun', 'Moon', 'Star', 'Wind']
+NAME_SUFFIXES = ['ville', 'town', 'ford', 'bridge', 'gate', 'hold', 'port', 'stead', 'val', 'grad']

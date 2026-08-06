@@ -39,9 +39,10 @@ class WorldMap:
         self.city_engine = CityBuilderEngine()
         self.infra_graph = InfrastructureGraph()
 
-        self.cities = self.city_engine.generate_cities(tiles=self.tiles)
+        cities_list = self.city_engine.generate_cities(tiles=self.tiles)
+        self.cities = {c.id_num: c for c in cities_list}
 
-        self.infra_graph.build_regional_network(tiles=self.tiles, cities=self.cities)
+        self.infra_graph.build_regional_network(tiles=self.tiles, cities=cities_list)
 
     @cached_property
     def tiles(self) -> dict[Hex, HexTile]:

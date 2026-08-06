@@ -8,7 +8,9 @@ from nodos.config import (
     HEX_DIRECTIONS,
     INIT_NUM_CITIES,
     MIN_CITY_DISTANCE,
-    ZONE_COLORS
+    NAME_PREFIXES,
+    NAME_SUFFIXES,
+    ZONE_COLORS,
 )
 
 
@@ -20,8 +22,16 @@ class City:
         self.id_num = id_num
         self.center = center
 
-        self.industrial_angle: float = random.uniform(a=0.0, b=2.0 * math.pi)
+        self.name = f'{random.choice(NAME_PREFIXES)}{random.choice(NAME_SUFFIXES)}'
 
+        self.color = (
+            random.randint(a=50, b=220),
+            random.randint(a=50, b=220),
+            random.randint(a=50, b=220),
+            180
+        )
+
+        self.industrial_angle: float = random.uniform(a=0.0, b=2.0 * math.pi)
         self.districts: dict[Hex, str] = {center: 'center'}
 
 
