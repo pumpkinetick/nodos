@@ -3,7 +3,7 @@ import networkx as nx
 from nodos.core.hex_math import Hex
 from nodos.world.zones import City
 
-from nodos.config import HEX_DIRECTIONS
+from nodos.config import HEX_DIRECTIONS, NUM_NEIGHBORS
 
 
 class InfrastructureGraph:
@@ -38,7 +38,7 @@ class InfrastructureGraph:
                 key=lambda c: city_a.center.distance_to(other=c.center)
             )
 
-            for city_b in others[:2]:
+            for city_b in others[:NUM_NEIGHBORS]:
                 try:
                     path = nx.astar_path(
                         G=nav_graph,
