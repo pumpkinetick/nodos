@@ -1,8 +1,12 @@
 import opensimplex
 
 from nodos.config import (
-    NOISE_SEED, NOISE_SCALE, NOISE_OCTAVES, NOISE_PERSISTENCE, NOISE_LACUNARITY,
-    BIOMES
+    BIOMES,
+    NOISE_LACUNARITY,
+    NOISE_OCTAVES,
+    NOISE_PERSISTENCE,
+    NOISE_SCALE,
+    NOISE_SEED,
 )
 
 

@@ -6,7 +6,7 @@ from nodos.core.hex_math import Hex
 from nodos.world.terrain import TerrainGenerator
 from nodos.world.zones import CityBuilderEngine
 
-from nodos.config import MAP_WIDTH, MAP_HEIGHT
+from nodos.config import MAP_HEIGHT, MAP_WIDTH
 
 
 class HexTile:

@@ -17,8 +17,8 @@ class InfrastructureGraph:
                                ):
         nav_graph = nx.Graph()
 
-        for hex_obj, tile in tiles.items():
-            if not tile.is_buildable:
+        for hex_obj, hex_tile in tiles.items():
+            if not hex_tile.is_buildable:
                 continue
 
             nav_graph.add_node(hex_obj)
@@ -29,7 +29,7 @@ class InfrastructureGraph:
                     nav_graph.add_edge(
                         u_of_edge=hex_obj,
                         v_of_edge=neighbor,
-                        weight=abs(tile.elevation - tiles[neighbor].elevation)
+                        weight=abs(hex_tile.elevation - tiles[neighbor].elevation)
                     )
 
         for city_a in cities:
@@ -51,7 +51,7 @@ class InfrastructureGraph:
                     for p1, p2 in zip(path[:-1], path[1:]):
                         if (p1, p2) not in self.road_edges and (p2, p1) not in self.road_edges:
                             self.road_edges.append((p1, p2))
-                            self.graph.add_edge(p1, p2)
+                            self.graph.add_edge(u_of_edge=p1, v_of_edge=p2)
 
                 except nx.NetworkXNoPath:
                     continue

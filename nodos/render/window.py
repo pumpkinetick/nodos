@@ -16,15 +16,16 @@ class Window(arcade.Window):
             width=width,
             height=height,
             title=title,
-            resizable=True
+            resizable=False
         )
 
         arcade.set_background_color(arcade.color.CHARCOAL)
 
+        self.layout = HexLayout()
         self.world_map = WorldMap()
 
         self.camera_controller = CameraController()
-        self.layout = HexLayout()
+
         self.drawer = HexBatchDrawer(layout=self.layout)
         self.drawer.build_geometry(world_map=self.world_map)
 

@@ -2,7 +2,13 @@ import random
 
 from nodos.core.hex_math import Hex
 
-from nodos.config import NUM_CITIES, CITY_EXPANSION_STEPS, ZONE_TYPES, ZONE_COLORS, HEX_DIRECTIONS
+from nodos.config import (
+    CITY_EXPANSION_STEPS,
+    HEX_DIRECTIONS,
+    NUM_CITIES,
+    ZONE_COLORS,
+    ZONE_TYPES,
+)
 
 
 class City:
@@ -26,7 +32,7 @@ class CityBuilderEngine:
         if num_seeds == 0:
             return list()
 
-        seed_hexes = random.sample(buildable_hexes, k=num_seeds)
+        seed_hexes = random.sample(population=buildable_hexes, k=num_seeds)
 
         cities = list()
         for i, center_hex in enumerate(seed_hexes, start=1):
@@ -47,25 +53,22 @@ class CityBuilderEngine:
                 for current_hex in frontier:
                     for dq, dr in HEX_DIRECTIONS:
                         neighbor = Hex(q=current_hex.q + dq, r=current_hex.r + dr)
-
                         if (
                             neighbor in tiles and
                             tiles[neighbor].is_buildable and
-                            neighbor not in visited
+                            neighbor not in visited and
+                            tiles[neighbor].city_id is None
                         ):
-                            if tiles[neighbor].city_id is None:
-                                visited.add(neighbor)
-                                next_frontier.append(neighbor)
+                            visited.add(neighbor)
+                            next_frontier.append(neighbor)
 
-                                zone_type = random.choice(ZONE_TYPES)
-                                city.districts[neighbor] = zone_type
+                            zone_type = random.choice(seq=ZONE_TYPES)
+                            city.districts[neighbor] = zone_type
 
-                                tiles[neighbor].city_id = city.id_num
-                                tiles[neighbor].zone_type = zone_type
-                                tiles[neighbor].zone_color = ZONE_COLORS[zone_type]
+                            tiles[neighbor].city_id = city.id_num
+                            tiles[neighbor].zone_type = zone_type
+                            tiles[neighbor].zone_color = ZONE_COLORS[zone_type]
 
                 frontier = next_frontier
-
             cities.append(city)
-
         return cities

@@ -1,4 +1,4 @@
-from arcade.shape_list import ShapeElementList, create_polygon, create_line_strip
+from arcade.shape_list import ShapeElementList, create_line_strip, create_polygon
 
 from nodos.core.hex_math import HexLayout
 from nodos.world.map import WorldMap
@@ -19,10 +19,10 @@ class HexBatchDrawer:
         self.terrain_shapes = ShapeElementList()
         self.district_shapes = ShapeElementList()
 
-        for hex_obj, tile in world_map.tiles.items():
+        for hex_obj, hex_tile in world_map.tiles.items():
             corners = self.layout.polygon_corners(hex_obj=hex_obj)
 
-            t_fill = tile.color
+            t_fill = hex_tile.color
             t_border = (max(0, t_fill[0] - 20),
                         max(0, t_fill[1] - 20),
                         max(0, t_fill[2] - 20),
@@ -35,8 +35,8 @@ class HexBatchDrawer:
                 point_list=corners + [corners[0]], color=t_border
             ))
 
-            if tile.zone_color:
-                d_fill = tile.zone_color
+            if hex_tile.zone_color:
+                d_fill = hex_tile.zone_color
                 d_border = (max(0, d_fill[0] - 30),
                             max(0, d_fill[1] - 30),
                             max(0, d_fill[2] - 30),
