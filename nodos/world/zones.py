@@ -7,6 +7,7 @@ from nodos.config import (
     CITY_EXPANSION_STEPS,
     HEX_DIRECTIONS,
     INIT_NUM_CITIES,
+    MIN_CITY_DISTANCE,
     ZONE_COLORS
 )
 
@@ -35,7 +36,10 @@ class CityBuilderEngine:
         if num_seeds == 0:
             return list()
 
-        seed_hexes = random.sample(population=buildable_hexes, k=num_seeds)
+        seed_hexes = cls._select_spread_seeds(
+            buildable_hexes=buildable_hexes,
+            min_distance=MIN_CITY_DISTANCE
+        )
 
         cities = list()
         for i, center_hex in enumerate(seed_hexes, start=1):
@@ -79,6 +83,36 @@ class CityBuilderEngine:
                 frontier = next_frontier
             cities.append(city)
         return cities
+
+    @classmethod
+    def _select_spread_seeds(cls,
+                             buildable_hexes: list[Hex],
+                             min_distance: int
+                             ) -> list[Hex]:
+        candidates = buildable_hexes.copy()
+        random.shuffle(candidates)
+
+        selected_seeds = list()
+        for candidate in candidates:
+            if len(selected_seeds) >= INIT_NUM_CITIES:
+                break
+
+            is_valid_location = True
+            for seed in selected_seeds:
+                if candidate.distance_to(other=seed) < min_distance:
+                    is_valid_location = False
+                    break
+
+            if is_valid_location:
+                selected_seeds.append(candidate)
+
+        if len(selected_seeds) < INIT_NUM_CITIES and min_distance > CITY_EXPANSION_STEPS:
+            return cls._select_spread_seeds(
+                buildable_hexes=buildable_hexes,
+                min_distance=min_distance - 1
+            )
+
+        return selected_seeds
 
     @classmethod
     def _determine_directional_zone(cls,

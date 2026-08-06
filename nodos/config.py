@@ -9,14 +9,14 @@ WINDOW_TITLE = 'Nodos'
 HEX_SIZE = 32.0
 ORIGIN_X = 0.0
 ORIGIN_Y = 0.0
-MAP_WIDTH = 160
-MAP_HEIGHT = 90
+MAP_WIDTH = 100
+MAP_HEIGHT = 100
 
 # --- Terrain Noise Generation ---
 NOISE_SEED = 42
-NOISE_SCALE = 0.05
-NOISE_OCTAVES = 3
-NOISE_PERSISTENCE = 0.5
+NOISE_SCALE = 1.0 / 30
+NOISE_OCTAVES = 5
+NOISE_PERSISTENCE = 1.0 / 2
 NOISE_LACUNARITY = 2.0
 
 # --- Biome Definitions ---
@@ -24,7 +24,7 @@ NOISE_LACUNARITY = 2.0
 BIOMES = [
     (-0.3, (25, 60, 110, 255), False, 'deep_water'),
     (-0.2, (45, 105, 175, 255), False, 'shallow_water'),
-    (-0.1, (230, 200, 120, 255), True, 'shore'),
+    (-0.15, (230, 200, 120, 255), True, 'shore'),
     (0.1, (110, 160, 80, 255), True, 'plains'),
     (0.3, (60, 130, 75, 255), True, 'forest'),
     (0.4, (130, 150, 100, 255), True, 'hills'),
@@ -33,7 +33,8 @@ BIOMES = [
 ]
 
 # --- Cities & Zoning ---
-INIT_NUM_CITIES = 6
+INIT_NUM_CITIES = 20
+MIN_CITY_DISTANCE = 12
 CITY_EXPANSION_STEPS = 3
 ZONE_COLORS = {
     'center': (255, 255, 255, 255),
