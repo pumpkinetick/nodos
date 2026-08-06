@@ -50,7 +50,7 @@ class Window(arcade.Window):
                 color=arcade.color.WHITE,
                 font_size=12
             )
-            for i in range(4)
+            for i in range(3)
         ]
 
     def on_draw(self):
@@ -72,7 +72,6 @@ class Window(arcade.Window):
             tile = self.world_map.get_tile(hex_obj=self.hovered_hex)
             if tile:
                 info_lines = [
-                    f'Hex: {tile.hex_obj.q}, {tile.hex_obj.r}',
                     f'Biome: {tile.biome.title()}'
                 ]
                 if tile.city_id is not None:
@@ -80,29 +79,34 @@ class Window(arcade.Window):
                     info_lines.append(f'City: {city.name}')
                     info_lines.append(f'District: {tile.zone_type.title()}')
 
-                line_height = 20
-                padding = 15
-                box_width = 220
-                box_height = padding + len(info_lines) * line_height
-                box_x = 20
-                box_y = 20
+                world_x, world_y = self.layout.hex_to_pixel(hex_obj=self.hovered_hex)
+                screen_pos = self.camera_controller.world_camera.project((world_x, world_y))
+
+                line_height = 18
+                padding = 10
+                box_width = 180
+                box_height =  len(info_lines) * line_height + padding * 2
+                box_x = screen_pos[0]
+                box_y = screen_pos[1] + 25.0
 
                 arcade.draw_rect_filled(
                     rect=arcade.rect.XYWH(
                         x=box_x,
                         y=box_y,
                         width=box_width,
-                        height=box_height
+                        height=box_height,
+                        anchor=arcade.rect.AnchorPoint.BOTTOM_CENTER
                     ),
                     color=(0, 0, 0, 190)
                 )
 
                 for i, line in enumerate(info_lines):
-                    text_y = box_y + box_height - padding - (i * line_height)
-
                     text_obj = self.hud_text_objs[i]
+
                     text_obj.text = line
-                    text_obj.start_y = text_y
+                    text_obj.x = box_x - box_width / 2 + padding
+                    text_obj.y = box_y + box_height - padding - (i + 1) * line_height
+                    text_obj.anchor_y = 'bottom'
                     text_obj.draw()
 
     def on_mouse_motion(self,

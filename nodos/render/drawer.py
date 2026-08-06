@@ -89,7 +89,9 @@ class HexBatchDrawer:
                           tile: HexTile
                           ):
         if tile.zone_color:
-            z_border = self._darken_color(color=tile.zone_color, amount=50)
+            z_border = self._darken_color(
+                color=tile.zone_color, amount=50
+            )
             self._append_hex_shape(
                 target_list=self.zoning_shapes,
                 corners=corners,
@@ -104,7 +106,9 @@ class HexBatchDrawer:
                 tile.color[2] // 2,
                 255
             )
-            dimmed_border = self._darken_color(color=dimmed_fill, amount=15)
+            dimmed_border = self._darken_color(
+                color=dimmed_fill, amount=15
+            )
             self._append_hex_shape(
                 target_list=self.zoning_shapes,
                 corners=corners,
@@ -118,6 +122,17 @@ class HexBatchDrawer:
                            tile: HexTile,
                            world_map: WorldMap
                            ):
+        t_border = self._darken_color(
+            color=tile.color, amount=25
+        )
+        self._append_hex_shape(
+            target_list=self.terrain_shapes,
+            corners=corners,
+            fill_color=tile.color,
+            border_color=t_border,
+            line_width=1.0
+        )
+
         if tile.city_id is not None:
             city = world_map.cities[tile.city_id]
 
@@ -138,15 +153,6 @@ class HexBatchDrawer:
                 tile=tile,
                 world_map=world_map
             )
-        else:
-            t_border = self._darken_color(color=tile.color, amount=25)
-            self._append_hex_shape(
-                target_list=self.terrain_shapes,
-                corners=corners,
-                fill_color=tile.color,
-                border_color=t_border,
-                line_width=1.0
-            )
 
     def _bake_tile_borders(self,
                            hex_obj: Hex,
@@ -165,7 +171,9 @@ class HexBatchDrawer:
                 p1 = corners[i]
                 p2 = corners[(i + 1) % 6]
 
-                border_color = self._darken_color(color=city.color, amount=60)
+                border_color = self._darken_color(
+                    color=city.color, amount=60
+                )
                 self.border_shapes.append(
                     create_line(
                         start_x=p1[0],
@@ -173,7 +181,7 @@ class HexBatchDrawer:
                         end_x=p2[0],
                         end_y=p2[1],
                         color=border_color,
-                        line_width=3.0
+                        line_width=5.0
                     )
                 )
 
@@ -190,6 +198,6 @@ class HexBatchDrawer:
                     end_x=p2_x,
                     end_y=p2_y,
                     color=(60, 40, 30, 255),
-                    line_width=2.5
+                    line_width=3
                 )
             )
