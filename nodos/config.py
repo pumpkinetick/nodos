@@ -38,8 +38,8 @@ BIOMES = [
 ]
 
 # --- Cities & Zoning ---
-INIT_NUM_CITIES = 100
-MIN_CITY_DISTANCE = 12
+INIT_NUM_CITIES = 10
+MIN_CITY_DISTANCE = 20
 CITY_EXPANSION_STEPS = 3
 NUM_NEIGHBORS = 3
 ZONE_COLORS = {
@@ -50,3 +50,9 @@ ZONE_COLORS = {
 }
 NAME_PREFIXES = ['Oak', 'River', 'Stone', 'Iron', 'Kings', 'Frost', 'Sun', 'Moon', 'Star', 'Wind']
 NAME_SUFFIXES = ['ville', 'town', 'ford', 'bridge', 'gate', 'hold', 'port', 'stead', 'val', 'grad']
+
+# --- Default City State Values ---
+DEFAULT_POPULATION = 100.0
+DEFAULT_RESOURCES = 100.0
+DEFAULT_HAPPINESS = 1.0
+DEFAULT_GROWTH_RATE = 0.0

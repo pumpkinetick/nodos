@@ -4,6 +4,7 @@ import arcade
 from nodos.core.hex_math import Hex, HexLayout
 from nodos.render.camera import CameraController
 from nodos.render.drawer import HexBatchDrawer
+from nodos.sim import Simulation
 from nodos.world.map import WorldMap
 
 
@@ -30,6 +31,8 @@ class Window(arcade.Window):
 
         self.drawer = HexBatchDrawer(layout=self.layout)
         self.drawer.build_geometry(world_map=self.world_map)
+
+        self.sim = Simulation(world=self.world_map)
 
         self.active_keys = set()
         self.view_mode = 'terrain'
@@ -61,11 +64,13 @@ class Window(arcade.Window):
 
         self.gui_camera.use()
 
-        self.mode_text_obj.text = (
+        base = (
             "View: TERRAIN (Press 'Z' to toggle)"
             if self.view_mode == 'terrain'
             else "View: ZONING (Press 'Z' to toggle)"
         )
+        tick_info = f' | Tick: {self.sim.current_tick}' if hasattr(self, 'sim') else ''
+        self.mode_text_obj.text = base + tick_info
         self.mode_text_obj.draw()
 
         if self.hovered_hex:
@@ -121,6 +126,12 @@ class Window(arcade.Window):
     def on_update(self,
                   delta_time: float
                   ):
+        try:
+            self.sim.tick()
+        except Exception:
+            import logging as _logging
+            _logging.getLogger(__name__).exception('Simulation tick error')
+
         self.camera_controller.update(delta_time=delta_time, active_keys=self.active_keys)
 
     def on_mouse_scroll(self,
