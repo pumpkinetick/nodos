@@ -32,13 +32,12 @@ BIOMES = [
     (float('inf'), (220, 225, 230, 255), False, 'snow')
 ]
 
-# --- Districts & Zoning ---
-NUM_CITIES = 6
-CITY_EXPANSION_STEPS = 10
-ZONE_TYPES = ['residential', 'industrial', 'commercial']
+# --- Cities & Zoning ---
+INIT_NUM_CITIES = 6
+CITY_EXPANSION_STEPS = 3
 ZONE_COLORS = {
     'center': (255, 255, 255, 255),
-    'residential': (220, 180, 50, 255),
-    'industrial': (70, 130, 200, 255),
+    'residential': (70, 130, 200, 255),
+    'industrial': (220, 180, 50, 255),
     'commercial': (210, 80, 80, 255)
 }
