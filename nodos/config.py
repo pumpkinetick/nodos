@@ -51,6 +51,9 @@ ZONE_COLORS = {
 NAME_PREFIXES = ['Oak', 'River', 'Stone', 'Iron', 'Kings', 'Frost', 'Sun', 'Moon', 'Star', 'Wind']
 NAME_SUFFIXES = ['ville', 'town', 'ford', 'bridge', 'gate', 'hold', 'port', 'stead', 'val', 'grad']
 
+# --- Graph Settings ---
+ELEVATION_FACTOR = 2.0
+
 # --- Default City State Values ---
 DEFAULT_POPULATION = 100
 DEFAULT_HAPPINESS = 0.0

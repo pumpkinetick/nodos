@@ -3,7 +3,7 @@ import networkx as nx
 from nodos.core.hex_math import Hex
 from nodos.world.zones import City
 
-from nodos.config import HEX_DIRECTIONS, NUM_NEIGHBORS
+from nodos.config import ELEVATION_FACTOR, HEX_DIRECTIONS, NUM_NEIGHBORS
 
 
 class InfrastructureGraph:
@@ -26,10 +26,11 @@ class InfrastructureGraph:
             for dq, dr in HEX_DIRECTIONS:
                 neighbor = Hex(q=hex_obj.q + dq, r=hex_obj.r + dr)
                 if neighbor in tiles and tiles[neighbor].is_buildable:
+                    elevation_diff = abs(hex_tile.elevation - tiles[neighbor].elevation)
                     nav_graph.add_edge(
                         u_of_edge=hex_obj,
                         v_of_edge=neighbor,
-                        weight=abs(hex_tile.elevation - tiles[neighbor].elevation)
+                        weight=elevation_diff ** ELEVATION_FACTOR
                     )
 
         for city_a in cities:
