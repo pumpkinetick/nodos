@@ -52,7 +52,12 @@ NAME_PREFIXES = ['Oak', 'River', 'Stone', 'Iron', 'Kings', 'Frost', 'Sun', 'Moon
 NAME_SUFFIXES = ['ville', 'town', 'ford', 'bridge', 'gate', 'hold', 'port', 'stead', 'val', 'grad']
 
 # --- Default City State Values ---
-DEFAULT_POPULATION = 100.0
-DEFAULT_RESOURCES = 100.0
-DEFAULT_HAPPINESS = 1.0
-DEFAULT_GROWTH_RATE = 0.0
+DEFAULT_POPULATION = 100
+DEFAULT_HAPPINESS = 0.0
+POPULATION_SENSITIVITY = 0.01
+
+DEATH_POPULATION_THRESHOLD = 1.0
+
+DEFAULT_RESOURCES = 100
+DEFAULT_DEVELOPMENT = 0.0
+RESOURCE_SENSITIVITY = 0.01

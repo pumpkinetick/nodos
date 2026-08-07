@@ -8,10 +8,13 @@ from nodos.world.map import WorldMap
 from nodos.world.zones import City
 
 from nodos.config import (
-    DEFAULT_GROWTH_RATE,
+    DEATH_POPULATION_THRESHOLD,
+    DEFAULT_DEVELOPMENT,
     DEFAULT_HAPPINESS,
     DEFAULT_POPULATION,
-    DEFAULT_RESOURCES
+    DEFAULT_RESOURCES,
+    POPULATION_SENSITIVITY,
+    RESOURCE_SENSITIVITY
 )
 
 logger = logging.getLogger(__name__)
@@ -49,9 +52,9 @@ class Simulation:
     def _default_city_state() -> dict[str, Any]:
         return {
             'population': DEFAULT_POPULATION,
-            'resources': DEFAULT_RESOURCES,
             'happiness': DEFAULT_HAPPINESS,
-            'growth_rate': DEFAULT_GROWTH_RATE
+            'resources': DEFAULT_RESOURCES,
+            'development': DEFAULT_DEVELOPMENT
         }
 
     def register_hook(self,
@@ -69,6 +72,40 @@ class Simulation:
         if hook_name not in self.hooks:
             raise KeyError(f'Unknown hook name: {hook_name}')
         self.hooks[hook_name].remove(func)
+
+    def _apply_metric_updates(self,
+                              city: City,
+                              state: dict[str, Any]
+                              ):
+        pop = int(state.get(
+            'population', DEFAULT_POPULATION
+        ))
+        res = int(state.get(
+            'resources', DEFAULT_RESOURCES
+        ))
+
+        happiness = float(state.get(
+            'happiness', DEFAULT_HAPPINESS
+        ))
+        development = float(state.get(
+            'development', DEFAULT_DEVELOPMENT
+        ))
+
+        pop_rate = happiness * POPULATION_SENSITIVITY
+        res_rate = development * RESOURCE_SENSITIVITY
+
+        new_pop = round(max(0.0, pop * (1.0 + pop_rate)))
+        new_res = round(max(0.0, res * (1.0 + res_rate)))
+
+        state['population'] = new_pop
+        state['resources'] = new_res
+
+        if new_pop <= DEATH_POPULATION_THRESHOLD:
+            logger.info(
+                'City %s (id=%s) died (population=%.2f)',
+                getattr(city, 'name', ''), city.id_num, new_pop
+            )
+            self.remove_city(city.id_num)
 
     def tick(self):
         logger.debug(
@@ -96,6 +133,13 @@ class Simulation:
                     logger.exception(
                         'Error in city_tick hook %s for city %d', fn, cid
                     )
+
+            try:
+                self._apply_metric_updates(city, state)
+            except Exception:
+                logger.exception(
+                    'Error applying metric updates for city %s', cid
+                )
 
         for fn in list(self.hooks['post_tick']):
             try:
