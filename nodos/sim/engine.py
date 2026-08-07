@@ -12,9 +12,7 @@ from nodos.config import (
     DEFAULT_DEVELOPMENT,
     DEFAULT_HAPPINESS,
     DEFAULT_POPULATION,
-    DEFAULT_RESOURCES,
-    POPULATION_SENSITIVITY,
-    RESOURCE_SENSITIVITY
+    DEFAULT_RESOURCES
 )
 
 logger = logging.getLogger(__name__)
@@ -91,11 +89,8 @@ class Simulation:
             'development', DEFAULT_DEVELOPMENT
         ))
 
-        pop_rate = happiness * POPULATION_SENSITIVITY
-        res_rate = development * RESOURCE_SENSITIVITY
-
-        new_pop = round(max(0.0, pop * (1.0 + pop_rate)))
-        new_res = round(max(0.0, res * (1.0 + res_rate)))
+        new_pop = round(max(0.0, pop * (1.0 + happiness)))
+        new_res = round(max(0.0, res * (1.0 + development)))
 
         state['population'] = new_pop
         state['resources'] = new_res
