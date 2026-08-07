@@ -48,7 +48,7 @@ class Window(arcade.Window):
             font_size=14, bold=True
         )
 
-        self.hud_text_objs = [
+        self.hud_left_text_objs = [
             arcade.Text(
                 text='',
                 x=30, y=30 + i * 20,
@@ -56,6 +56,15 @@ class Window(arcade.Window):
                 font_size=12
             )
             for i in range(3)
+        ]
+        self.hud_right_text_objs = [
+            arcade.Text(
+                text='',
+                x=30, y=30 + i * 20,
+                color=arcade.color.WHITE,
+                font_size=12
+            )
+            for i in range(4)
         ]
 
     def on_draw(self):
@@ -78,21 +87,45 @@ class Window(arcade.Window):
         if self.hovered_hex:
             tile = self.world_map.get_tile(hex_obj=self.hovered_hex)
             if tile:
-                info_lines = [
-                    f'Biome: {tile.biome.title()}'
-                ]
-                if tile.city_id is not None:
+                left_lines = [f'Biome: {tile.biome.title()}']
+                right_lines: list[str] = list()
+
+                if tile.city_id is not None and tile.city_id in self.world_map.cities:
                     city = self.world_map.cities[tile.city_id]
-                    info_lines.append(f'City: {city.name}')
-                    info_lines.append(f'District: {tile.zone_type.title()}')
+                    left_lines.append(f'City: {city.name}')
+                    left_lines.append(f'District: {tile.zone_type.title()}')
+
+                    state = None
+                    if hasattr(self, 'sim'):
+                        try:
+                            state = self.sim.get_city_state(city.id_num)
+                        except Exception:
+                            state = None
+
+                    if state:
+                        pop = int(state.get('population', 0))
+                        res = int(state.get('resources', 0))
+                        happiness = float(state.get('happiness', 0.0))
+                        development = float(state.get('development', 0.0))
+                        right_lines = [
+                            f'Population: {pop}',
+                            f'Resources: {res}',
+                            f'Happiness: {happiness:+.2f}',
+                            f'Development: {development:+.2f}'
+                        ]
+                else:
+                    left_lines.append('No city')
 
                 world_x, world_y = self.layout.hex_to_pixel(hex_obj=self.hovered_hex)
                 screen_pos = self.camera_controller.world_camera.project((world_x, world_y))
 
                 line_height = 18
                 padding = 10
-                box_width = 180
-                box_height =  len(info_lines) * line_height + padding * 2
+                col_spacing = 10
+                left_col_width = 150
+                right_col_width = 150
+                box_width = left_col_width + col_spacing + right_col_width
+                box_height = max(len(left_lines), len(right_lines)) * line_height + padding * 2
                 box_x = screen_pos[0]
                 box_y = screen_pos[1] + 25.0
 
@@ -107,11 +140,20 @@ class Window(arcade.Window):
                     color=(0, 0, 0, 190)
                 )
 
-                for i, line in enumerate(info_lines):
-                    text_obj = self.hud_text_objs[i]
+                for i, line in enumerate(left_lines):
+                    text_obj = self.hud_left_text_objs[i]
 
                     text_obj.text = line
                     text_obj.x = box_x - box_width / 2 + padding
+                    text_obj.y = box_y + box_height - padding - (i + 1) * line_height
+                    text_obj.anchor_y = 'bottom'
+                    text_obj.draw()
+
+                for i, line in enumerate(right_lines):
+                    text_obj = self.hud_right_text_objs[i]
+
+                    text_obj.text = line
+                    text_obj.x = box_x - box_width / 2 + padding + left_col_width + col_spacing
                     text_obj.y = box_y + box_height - padding - (i + 1) * line_height
                     text_obj.anchor_y = 'bottom'
                     text_obj.draw()
