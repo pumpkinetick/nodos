@@ -25,14 +25,16 @@ class Window(arcade.Window):
 
         self.layout = HexLayout()
         self.world_map = WorldMap()
+
+        self.sim = Simulation(world=self.world_map)
+        self._sim_time_acc: float = 0.0
+
         self.camera_controller = CameraController()
 
         self.gui_camera = arcade.Camera2D()
 
         self.drawer = HexBatchDrawer(layout=self.layout)
         self.drawer.build_geometry(world_map=self.world_map)
-
-        self.sim = Simulation(world=self.world_map)
 
         self.active_keys = set()
         self.view_mode = 'terrain'
@@ -126,8 +128,11 @@ class Window(arcade.Window):
     def on_update(self,
                   delta_time: float
                   ):
+        self._sim_time_acc += delta_time
         try:
-            self.sim.tick()
+            while self._sim_time_acc >= self.sim.tick_length:
+                self.sim.tick()
+                self._sim_time_acc -= self.sim.tick_length
         except Exception:
             import logging as _logging
             _logging.getLogger(__name__).exception('Simulation tick error')
