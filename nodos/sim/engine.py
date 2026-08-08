@@ -32,7 +32,8 @@ class Simulation:
         self.hooks: dict[str, list[Callable[..., Any]]] = {
             'pre_tick': list(),
             'post_tick': list(),
-            'city_tick': list()
+            'city_tick': list(),
+            'city_removed': list()
         }
 
         logger.info(
@@ -183,5 +184,42 @@ class Simulation:
     def remove_city(self,
                     city_id: int
                     ):
+        city = self.world.cities.get(city_id)
+
+        try:
+            if city is not None and hasattr(city, 'districts'):
+                for hex_obj in list(city.districts.keys()):
+                    tile = self.world.tiles.get(hex_obj)
+                    if tile and tile.city_id == city_id:
+                        tile.city_id = None
+                        tile.zone_type = None
+                        tile.zone_color = None
+            else:
+                for tile in self.world.tiles.values():
+                    if getattr(tile, 'city_id', None) == city_id:
+                        tile.city_id = None
+                        tile.zone_type = None
+                        tile.zone_color = None
+        except Exception:
+            logger.exception(
+                'Error clearing tiles for removed city %s', city_id
+            )
+
         self.world.cities.pop(city_id, None)
         self.city_states.pop(city_id, None)
+
+        try:
+            if city is not None and hasattr(city, 'center'):
+                self.world.infra_graph.remove_city_connections(center=city.center)
+        except Exception:
+            logger.exception(
+                'Error removing infrastructure edges for city %s', city_id
+            )
+
+        for fn in list(self.hooks.get('city_removed', [])):
+            try:
+                fn(self, city_id)
+            except Exception:
+                logger.exception(
+                    'Error in city_removed hook %s', fn
+                )

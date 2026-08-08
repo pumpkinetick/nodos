@@ -36,6 +36,15 @@ class Window(arcade.Window):
         self.drawer = HexBatchDrawer(layout=self.layout)
         self.drawer.build_geometry(world_map=self.world_map)
 
+        self._needs_rebuild = False
+        try:
+            self.sim.register_hook(
+                'city_removed', lambda sim, cid: setattr(self, '_needs_rebuild', True)
+            )
+        except Exception:
+            import logging as _logging
+            _logging.getLogger(__name__).exception('Failed registering city_removed hook')
+
         self.active_keys = set()
         self.view_mode = 'terrain'
 
@@ -178,6 +187,19 @@ class Window(arcade.Window):
         except Exception:
             import logging as _logging
             _logging.getLogger(__name__).exception('Simulation tick error')
+
+        if getattr(self, '_needs_rebuild', False):
+            try:
+                # Rebuild full geometry on the next frame so tile / zoning polygons
+                # are regenerated and city tiles disappear correctly. This is
+                # deferred and coalesced to avoid repeated work within the same
+                # frame when multiple cities die at once.
+                self.drawer.build_geometry(world_map=self.world_map)
+            except Exception:
+                import logging as _logging
+                _logging.getLogger(__name__).exception('Error rebuilding geometry')
+            finally:
+                self._needs_rebuild = False
 
         self.camera_controller.update(delta_time=delta_time, active_keys=self.active_keys)
 
