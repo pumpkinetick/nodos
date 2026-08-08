@@ -45,16 +45,28 @@ class HexLayout:
         self.origin_x = origin_x
         self.origin_y = origin_y
 
+        self._pixel_cache: dict[Hex, tuple[float, float]] = dict()
+        self._corner_cache: dict[Hex, list[tuple[float, float]]] = dict()
+
     def hex_to_pixel(self,
                      hex_obj: Hex
                      ) -> tuple[float, float]:
+        p = self._pixel_cache.get(hex_obj)
+        if p is not None:
+            return p
+
         x = self.size * (math.sqrt(3) * hex_obj.q + math.sqrt(3) / 2.0 * hex_obj.r) + self.origin_x
         y = self.size * (3.0 / 2.0 * hex_obj.r) + self.origin_y
+        self._pixel_cache[hex_obj] = (x, y)
         return x, y
 
     def polygon_corners(self,
                         hex_obj: Hex
                         ) -> list[tuple[float, float]]:
+        corners = self._corner_cache.get(hex_obj)
+        if corners is not None:
+            return corners
+
         center_x, center_y = self.hex_to_pixel(hex_obj=hex_obj)
         corners = list()
         for i in range(6):
@@ -62,7 +74,12 @@ class HexLayout:
             x = center_x + self.size * math.cos(angle_rad)
             y = center_y + self.size * math.sin(angle_rad)
             corners.append((x, y))
+        self._corner_cache[hex_obj] = corners
         return corners
+
+    def clear_cache(self):
+        self._pixel_cache.clear()
+        self._corner_cache.clear()
 
     def pixel_to_hex(self,
                      x: float,
