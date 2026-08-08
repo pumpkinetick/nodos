@@ -22,14 +22,8 @@ class InfrastructureGraph:
         self.road_edges: list[tuple[Hex, Hex]] = list()
         self.city_edge_map: dict[Hex, set[tuple[Hex, Hex]]] = dict()
 
-    def build_regional_network(self,
-                               tiles: dict,
-                               cities: list[City]
-                               ):
-        self.graph.clear()
-        self.road_edges.clear()
-        self.city_edge_map.clear()
-
+    @staticmethod
+    def _build_nav_graph(tiles: dict) -> nx.Graph:
         nav_graph: nx.Graph = nx.Graph()
 
         for hex_obj, hex_tile in tiles.items():
@@ -47,6 +41,18 @@ class InfrastructureGraph:
                         v_of_edge=neighbor,
                         weight=elevation_diff ** ELEVATION_FACTOR
                     )
+
+        return nav_graph
+
+    def build_regional_network(self,
+                               tiles: dict,
+                               cities: list[City]
+                               ):
+        self.graph.clear()
+        self.road_edges.clear()
+        self.city_edge_map.clear()
+
+        nav_graph = self._build_nav_graph(tiles=tiles)
 
         for city_a in cities:
             others_sorted = sorted(
@@ -106,3 +112,36 @@ class InfrastructureGraph:
         for node in list(self.graph.nodes()):
             if self.graph.degree(node) == 0:
                 self.graph.remove_node(node)
+
+    def connect_cities(self,
+                       city_a_center: Hex,
+                       city_b_center: Hex,
+                       tiles: dict
+                       ) -> bool:
+        nav_graph = self._build_nav_graph(tiles=tiles)
+
+        try:
+            path = nx.astar_path(
+                G=nav_graph,
+                source=city_a_center,
+                target=city_b_center,
+                heuristic=lambda a, b: a.distance_to(other=b),
+                weight='weight'
+            )
+
+            self.city_edge_map.setdefault(city_a_center, set())
+            self.city_edge_map.setdefault(city_b_center, set())
+
+            for p1, p2 in zip(path[:-1], path[1:]):
+                edge = (p1, p2)
+                if not self.graph.has_edge(p1, p2):
+                    self.road_edges.append(edge)
+                    self.graph.add_edge(u_of_edge=p1, v_of_edge=p2)
+
+                self.city_edge_map[city_a_center].add(edge)
+                self.city_edge_map[city_b_center].add(edge)
+
+            return True
+
+        except nx.NetworkXNoPath:
+            return False

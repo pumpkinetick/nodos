@@ -5,6 +5,7 @@ import random
 from typing import TYPE_CHECKING, Any
 
 from nodos.core.hex_math import Hex
+from nodos.world.city_init import CityInitializer
 
 from nodos.config import (
     DEFAULT_DEVELOPMENT,
@@ -14,8 +15,7 @@ from nodos.config import (
     DEFAULT_RESOURCES,
     HEX_DIRECTIONS,
     REPRODUCTION_RESOURCE_COST,
-    REPRODUCTION_THRESHOLD,
-    ZONE_COLORS
+    REPRODUCTION_THRESHOLD
 )
 
 if TYPE_CHECKING:
@@ -49,8 +49,8 @@ class ReproductionSystem:
         if offspring_center is None:
             return
 
-        child_transfer_pop = min(pop * 0.1, pop) # to config
-        child_transfer_res = min(res * 0.1, res) # to config
+        child_transfer_pop = min(pop * 0.1, pop)
+        child_transfer_res = min(res * 0.1, res)
 
         child_state = self.simulation.default_city_state()
         child_state['population'] = child_transfer_pop
@@ -58,8 +58,22 @@ class ReproductionSystem:
         child_state['resources'] = child_transfer_res
         child_state['development'] = DEFAULT_DEVELOPMENT
 
-        child_city = self._create_child_city(center_hex=offspring_center)
+        child_city = CityInitializer.create_expanded_city_inplace(
+            tiles=self.simulation.world.tiles,
+            city_id=self._next_city_id(),
+            center_hex=offspring_center
+        )
+
+        if child_city is None:
+            return
+
         self.simulation.add_city(city=child_city, state=child_state)
+
+        self.simulation.world.infra_graph.connect_cities(
+            city_a_center=city.center,
+            city_b_center=child_city.center,
+            tiles=self.simulation.world.tiles
+        )
 
         state['population'] = max(0.0, pop - child_transfer_pop)
         state['resources'] = max(0.0, res - child_transfer_res)
@@ -72,18 +86,6 @@ class ReproductionSystem:
             getattr(child_city, 'name', ''),
             child_city.id_num
         )
-
-    def _create_child_city(self,
-                           center_hex: Hex
-                           ) -> City:
-        child_city = self._make_city(center_hex=center_hex)
-        self._claim_city_tiles(city=child_city, center_hex=center_hex)
-        return child_city
-
-    def _make_city(self,
-                   center_hex: Hex
-                   ) -> City:
-        return City(id_num=self._next_city_id(), center=center_hex)
 
     def _find_reproduction_hex(self,
                                city: City
@@ -103,19 +105,6 @@ class ReproductionSystem:
             return None
 
         return random.choice(candidate_hexes)
-
-    def _claim_city_tiles(self,
-                          city: City,
-                          center_hex: Hex
-                          ):
-        tile = self.simulation.world.tiles.get(center_hex)
-        if tile is None:
-            return
-
-        tile.city_id = city.id_num
-        tile.zone_type = 'center'
-        tile.zone_color = ZONE_COLORS['center']
-        city.districts = {center_hex: 'center'}
 
     def _next_city_id(self) -> int:
         existing_ids = [cid for cid in self.simulation.world.cities.keys() if isinstance(cid, int)]
