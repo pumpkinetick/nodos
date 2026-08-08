@@ -5,6 +5,7 @@ from functools import cached_property
 from typing import Any, Callable, Optional
 
 from nodos.core.hex_math import Hex
+from nodos.sim.reproduction import ReproductionSystem
 from nodos.world.map import WorldMap
 from nodos.world.zones import City
 
@@ -37,6 +38,8 @@ class Simulation:
             'city_removed': list()
         }
 
+        self.reproduction = ReproductionSystem(simulation=self)
+
         logger.info(
             'Simulation initialized: %d cities', len(self.world.cities)
         )
@@ -45,16 +48,17 @@ class Simulation:
     def city_states(self) -> dict[int, dict[str, Any]]:
         states: dict[int, dict[str, Any]] = dict()
         for cid, city in self.world.cities.items():
-            states[cid] = self._default_city_state()
+            states[cid] = self.default_city_state()
         return states
 
     @staticmethod
-    def _default_city_state() -> dict[str, Any]:
+    def default_city_state() -> dict[str, Any]:
         return {
             'population': DEFAULT_POPULATION,
             'happiness': DEFAULT_HAPPINESS,
             'resources': DEFAULT_RESOURCES,
-            'development': DEFAULT_DEVELOPMENT
+            'development': DEFAULT_DEVELOPMENT,
+            'reproduction_cooldown': 0
         }
 
     def register_hook(self,
@@ -103,6 +107,9 @@ class Simulation:
                 getattr(city, 'name', ''), city.id_num, new_pop
             )
             self.remove_city(city.id_num)
+            return
+
+        self.reproduction.try_reproduce(city=city, state=state)
 
     def tick(self):
         logger.debug(
@@ -118,7 +125,7 @@ class Simulation:
         for cid, city in list(self.world.cities.items()):
             state = self.city_states.get(cid)
             if state is None:
-                state = self._default_city_state()
+                state = self.default_city_state()
                 self.city_states[cid] = state
 
             for fn in list(self.hooks['city_tick']):
@@ -172,7 +179,7 @@ class Simulation:
                  city: City
                  ):
         self.world.cities[city.id_num] = city
-        self.city_states[city.id_num] = self._default_city_state()
+        self.city_states[city.id_num] = self.default_city_state()
 
     def remove_city(self,
                     city_id: int
