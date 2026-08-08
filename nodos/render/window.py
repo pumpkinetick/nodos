@@ -7,8 +7,10 @@ from arcade.shape_list import ShapeElementList
 from nodos.core.hex_math import Hex, HexLayout
 from nodos.render.camera import CameraController
 from nodos.render.drawer import HexBatchDrawer
-from nodos.sim import Simulation
+from nodos.sim.engine import Simulation
 from nodos.world.map import WorldMap
+
+logger = logging.getLogger(__name__)
 
 
 class Window(arcade.Window):
@@ -49,11 +51,11 @@ class Window(arcade.Window):
                         self._removed_hexes_acc.extend(removed_hexes)
                         self._needs_rebuild = True
                 except Exception:
-                    logging.getLogger(__name__).exception('Error in city_removed handler')
+                    logger.exception('Error in city_removed handler')
 
             self.sim.register_hook(hook_name='city_removed', func=_on_city_removed)
         except Exception:
-            logging.getLogger(__name__).exception('Failed registering city_removed hook')
+            logger.exception('Failed registering city_removed hook')
 
         self.active_keys: set = set()
         self.view_mode: str = 'terrain'
@@ -195,7 +197,7 @@ class Window(arcade.Window):
                 self.sim.tick()
                 self._sim_time_acc -= self.sim.tick_length
         except Exception:
-            logging.getLogger(__name__).exception('Simulation tick error')
+            logger.exception('Simulation tick error')
 
         if getattr(self, '_needs_rebuild', False):
             try:
@@ -218,7 +220,7 @@ class Window(arcade.Window):
                 else:
                     self.drawer.build_geometry(world_map=self.world_map)
             except Exception:
-                logging.getLogger(__name__).exception('Error rebuilding geometry')
+                logger.exception('Error rebuilding geometry')
             finally:
                 self._needs_rebuild = False
 
