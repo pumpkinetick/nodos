@@ -1,5 +1,8 @@
+import logging
 from typing import Optional
+
 import arcade
+from arcade.shape_list import ShapeElementList
 
 from nodos.core.hex_math import Hex, HexLayout
 from nodos.render.camera import CameraController
@@ -36,14 +39,23 @@ class Window(arcade.Window):
         self.drawer = HexBatchDrawer(layout=self.layout)
         self.drawer.build_geometry(world_map=self.world_map)
 
-        self._needs_rebuild = False
+        self._needs_rebuild: bool = False
+        self._removed_hexes_acc: list[Hex] = list()
+
         try:
-            self.sim.register_hook(
-                'city_removed', lambda sim, cid: setattr(self, '_needs_rebuild', True)
-            )
+            def _on_city_removed(sim_obj, city_id, removed_hexes):
+                try:
+                    if removed_hexes:
+                        self._removed_hexes_acc.extend(removed_hexes)
+                        self._needs_rebuild = True
+                except Exception:
+                    logging.getLogger(__name__).exception(
+                        'Error in city_removed handler'
+                    )
+
+            self.sim.register_hook('city_removed', _on_city_removed)
         except Exception:
-            import logging as _logging
-            _logging.getLogger(__name__).exception('Failed registering city_removed hook')
+            logging.getLogger(__name__).exception('Failed registering city_removed hook')
 
         self.active_keys = set()
         self.view_mode = 'terrain'
@@ -190,11 +202,21 @@ class Window(arcade.Window):
 
         if getattr(self, '_needs_rebuild', False):
             try:
-                # Rebuild full geometry on the next frame so tile / zoning polygons
-                # are regenerated and city tiles disappear correctly. This is
-                # deferred and coalesced to avoid repeated work within the same
-                # frame when multiple cities die at once.
-                self.drawer.build_geometry(world_map=self.world_map)
+                if getattr(self, '_removed_hexes_acc', None):
+                    try:
+                        self.drawer.remove_tiles(self._removed_hexes_acc)
+                    except Exception:
+                        self.drawer.build_geometry(world_map=self.world_map)
+
+                    try:
+                        self.drawer.road_shapes = ShapeElementList()
+                        self.drawer.bake_roads(world_map=self.world_map)
+                    except Exception:
+                        self.drawer.build_geometry(world_map=self.world_map)
+
+                    self._removed_hexes_acc = []
+                else:
+                    self.drawer.build_geometry(world_map=self.world_map)
             except Exception:
                 import logging as _logging
                 _logging.getLogger(__name__).exception('Error rebuilding geometry')

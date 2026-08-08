@@ -4,6 +4,7 @@ import logging
 from functools import cached_property
 from typing import Any, Callable, Optional
 
+from nodos.core.hex_math import Hex
 from nodos.world.map import WorldMap
 from nodos.world.zones import City
 
@@ -186,6 +187,7 @@ class Simulation:
                     ):
         city = self.world.cities.get(city_id)
 
+        removed_hexes: list[Hex] = list()
         try:
             if city is not None and hasattr(city, 'districts'):
                 for hex_obj in list(city.districts.keys()):
@@ -194,12 +196,14 @@ class Simulation:
                         tile.city_id = None
                         tile.zone_type = None
                         tile.zone_color = None
+                        removed_hexes.append(hex_obj)
             else:
-                for tile in self.world.tiles.values():
+                for hex_obj, tile in self.world.tiles.items():
                     if getattr(tile, 'city_id', None) == city_id:
                         tile.city_id = None
                         tile.zone_type = None
                         tile.zone_color = None
+                        removed_hexes.append(hex_obj)
         except Exception:
             logger.exception(
                 'Error clearing tiles for removed city %s', city_id
@@ -218,7 +222,7 @@ class Simulation:
 
         for fn in list(self.hooks.get('city_removed', [])):
             try:
-                fn(self, city_id)
+                fn(self, city_id, removed_hexes)
             except Exception:
                 logger.exception(
                     'Error in city_removed hook %s', fn
