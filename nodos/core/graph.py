@@ -64,8 +64,7 @@ class InfrastructureGraph:
 
                     for p1, p2 in zip(path[:-1], path[1:]):
                         edge = (p1, p2)
-                        rev_edge = (p2, p1)
-                        if edge not in self.road_edges and rev_edge not in self.road_edges:
+                        if not self.graph.has_edge(p1, p2):
                             self.road_edges.append(edge)
                             self.graph.add_edge(u_of_edge=p1, v_of_edge=p2)
 

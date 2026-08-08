@@ -1,5 +1,6 @@
 import math
 import random
+from typing import Optional
 
 from nodos.core.hex_math import Hex
 
@@ -97,10 +98,12 @@ class CityBuilderEngine:
     @classmethod
     def _select_spread_seeds(cls,
                              buildable_hexes: list[Hex],
-                             min_distance: int
+                             min_distance: int,
+                             candidates: Optional[list[Hex]] = None
                              ) -> list[Hex]:
-        candidates = buildable_hexes.copy()
-        random.shuffle(candidates)
+        if candidates is None:
+            candidates = buildable_hexes.copy()
+            random.shuffle(candidates)
 
         selected_seeds: list[Hex] = list()
         for candidate in candidates:
@@ -119,7 +122,8 @@ class CityBuilderEngine:
         if len(selected_seeds) < INIT_NUM_CITIES and min_distance > CITY_EXPANSION_STEPS:
             return cls._select_spread_seeds(
                 buildable_hexes=buildable_hexes,
-                min_distance=min_distance - 1
+                min_distance=min_distance - 1,
+                candidates=candidates
             )
 
         return selected_seeds

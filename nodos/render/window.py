@@ -201,7 +201,10 @@ class Window(arcade.Window):
             try:
                 if getattr(self, '_removed_hexes_acc', None):
                     try:
-                        self.drawer.remove_tiles(self._removed_hexes_acc)
+                        self.drawer.remove_tiles(
+                            hexes=self._removed_hexes_acc,
+                            world_map=self.world_map
+                        )
                     except Exception:
                         self.drawer.build_geometry(world_map=self.world_map)
 

@@ -88,12 +88,20 @@ class HexBatchDrawer:
         self.bake_roads(world_map=world_map)
 
     def remove_tiles(self,
-                     hexes: list[Hex]
+                     hexes: list[Hex],
+                     world_map: WorldMap
                      ):
         for h in hexes:
             self._terrain_overlay_map.pop(h, None)
-            self._zoning_tile_map.pop(h, None)
             self._border_tile_map.pop(h, None)
+
+            tile = world_map.get_tile(hex_obj=h)
+            if tile:
+                corners = self.layout.polygon_corners(hex_obj=h)
+                self._zoning_tile_map[h] = self._bake_zoning_tile(
+                    corners=corners,
+                    tile=tile
+                )
 
         self.terrain_shapes = ShapeElementList()
         for shapes in self._terrain_base_map.values():

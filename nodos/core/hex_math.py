@@ -1,5 +1,4 @@
 import math
-from functools import cached_property
 
 from nodos.config import (
     HEX_SIZE,
@@ -15,10 +14,7 @@ class Hex:
                  ):
         self.q = q
         self.r = r
-
-    @cached_property
-    def s(self) -> int:
-        return -self.q - self.r
+        self.s: int = -q - r
 
     def __eq__(self,
                other: object
@@ -52,6 +48,14 @@ class HexLayout:
         self._pixel_cache: dict[Hex, tuple[float, float]] = dict()
         self._corner_cache: dict[Hex, list[tuple[float, float]]] = dict()
 
+        self._corner_offsets: list[tuple[float, float]] = [
+            (
+                self.size * math.cos(math.pi / 180.0 * (60 * i + 30)),
+                self.size * math.sin(math.pi / 180.0 * (60 * i + 30))
+            )
+            for i in range(6)
+        ]
+
     def hex_to_pixel(self,
                      hex_obj: Hex
                      ) -> tuple[float, float]:
@@ -72,12 +76,10 @@ class HexLayout:
             return corners
 
         center_x, center_y = self.hex_to_pixel(hex_obj=hex_obj)
-        corners: list[tuple[float, float]] = list()
-        for i in range(6):
-            angle_rad = math.pi / 180.0 * (60 * i + 30)
-            x = center_x + self.size * math.cos(angle_rad)
-            y = center_y + self.size * math.sin(angle_rad)
-            corners.append((x, y))
+        corners = [
+            (center_x + dx, center_y + dy)
+            for dx, dy in self._corner_offsets
+        ]
         self._corner_cache[hex_obj] = corners
         return corners
 
