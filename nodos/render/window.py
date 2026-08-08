@@ -8,6 +8,7 @@ from nodos.core.hex_math import Hex, HexLayout
 from nodos.render.camera import CameraController
 from nodos.render.drawer import HexBatchDrawer
 from nodos.sim.engine import Simulation
+from nodos.sim.hooks import SimulationWindowHooks
 from nodos.world.map import WorldMap
 
 logger = logging.getLogger(__name__)
@@ -45,15 +46,8 @@ class Window(arcade.Window):
         self._removed_hexes_acc: list[Hex] = list()
 
         try:
-            def _on_city_removed(sim_obj, city_id, removed_hexes):
-                try:
-                    if removed_hexes:
-                        self._removed_hexes_acc.extend(removed_hexes)
-                        self._needs_rebuild = True
-                except Exception:
-                    logger.exception('Error in city_removed handler')
-
-            self.sim.register_hook(hook_name='city_removed', func=_on_city_removed)
+            self.sim_hooks = SimulationWindowHooks(window=self)
+            self.sim_hooks.attach(simulation=self.sim)
         except Exception:
             logger.exception('Failed registering city_removed hook')
 
@@ -87,6 +81,13 @@ class Window(arcade.Window):
             )
             for i in range(4)
         ]
+
+    def queue_city_removal_updates(self,
+                                   removed_hexes: list[Hex]
+                                   ):
+        if removed_hexes:
+            self._removed_hexes_acc.extend(removed_hexes)
+            self._needs_rebuild = True
 
     def on_draw(self):
         self.clear()
