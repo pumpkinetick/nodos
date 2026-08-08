@@ -1,13 +1,18 @@
+from __future__ import annotations
+
 import networkx as nx
+from typing import TYPE_CHECKING
 
 from nodos.core.hex_math import Hex
-from nodos.world.zones import City
 
 from nodos.config import (
     ELEVATION_FACTOR,
     HEX_DIRECTIONS,
     NUM_NEIGHBORS
 )
+
+if TYPE_CHECKING:
+    from nodos.world.zones import City
 
 
 class InfrastructureGraph:

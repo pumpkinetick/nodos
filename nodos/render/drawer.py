@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from arcade.shape_list import (
     ShapeElementList,
     create_line,
@@ -6,12 +10,14 @@ from arcade.shape_list import (
 )
 
 from nodos.core.hex_math import Hex, HexLayout
-from nodos.world.map import HexTile, WorldMap
 
 from nodos.config import (
     POINTY_TOP_DIRECTIONS,
     ZONE_COLORS
 )
+
+if TYPE_CHECKING:
+    from nodos.world.map import HexTile, WorldMap
 
 
 class HexBatchDrawer:

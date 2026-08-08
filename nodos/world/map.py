@@ -1,15 +1,20 @@
+from __future__ import annotations
+
 from functools import cached_property
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from nodos.core.graph import InfrastructureGraph
 from nodos.core.hex_math import Hex
 from nodos.world.terrain import TerrainGenerator
-from nodos.world.zones import City, CityBuilderEngine
+from nodos.world.zones import CityBuilderEngine
 
 from nodos.config import (
     MAP_HEIGHT,
     MAP_WIDTH
 )
+
+if TYPE_CHECKING:
+    from nodos.world.zones import City
 
 
 class HexTile:
