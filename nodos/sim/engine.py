@@ -77,10 +77,10 @@ class Simulation:
                               city: City,
                               state: dict[str, Any]
                               ):
-        pop = int(state.get(
+        pop = float(state.get(
             'population', DEFAULT_POPULATION
         ))
-        res = int(state.get(
+        res = float(state.get(
             'resources', DEFAULT_RESOURCES
         ))
 
@@ -91,8 +91,8 @@ class Simulation:
             'development', DEFAULT_DEVELOPMENT
         ))
 
-        new_pop = round(max(0.0, pop * (1.0 + happiness)))
-        new_res = round(max(0.0, res * (1.0 + development)))
+        new_pop = max(0.0, pop * (1.0 + happiness))
+        new_res = max(0.0, res * (1.0 + development))
 
         state['population'] = new_pop
         state['resources'] = new_res

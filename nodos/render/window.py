@@ -125,13 +125,13 @@ class Window(arcade.Window):
                             state = None
 
                     if state:
-                        pop = int(state.get('population', 0))
-                        res = int(state.get('resources', 0))
+                        pop = float(state.get('population', 0.0))
+                        res = float(state.get('resources', 0.0))
                         happiness = float(state.get('happiness', 0.0))
                         development = float(state.get('development', 0.0))
                         right_lines = [
-                            f'Population: {pop}',
-                            f'Resources: {res}',
+                            f'Population: {pop:.0f}',
+                            f'Resources: {res:.0f}',
                             f'Happiness: {happiness:+.2f}',
                             f'Development: {development:+.2f}'
                         ]
