@@ -26,17 +26,17 @@ class Window(arcade.Window):
 
         arcade.set_background_color(arcade.color.CHARCOAL)
 
-        self.layout = HexLayout()
-        self.world_map = WorldMap()
+        self.layout: HexLayout = HexLayout()
+        self.world_map: WorldMap = WorldMap()
 
-        self.sim = Simulation(world=self.world_map)
+        self.sim: Simulation = Simulation(world=self.world_map)
         self._sim_time_acc: float = 0.0
 
-        self.camera_controller = CameraController()
+        self.camera_controller: CameraController = CameraController()
 
-        self.gui_camera = arcade.Camera2D()
+        self.gui_camera: arcade.Camera2D = arcade.Camera2D()
 
-        self.drawer = HexBatchDrawer(layout=self.layout)
+        self.drawer: HexBatchDrawer = HexBatchDrawer(layout=self.layout)
         self.drawer.build_geometry(world_map=self.world_map)
 
         self._needs_rebuild: bool = False
@@ -49,16 +49,14 @@ class Window(arcade.Window):
                         self._removed_hexes_acc.extend(removed_hexes)
                         self._needs_rebuild = True
                 except Exception:
-                    logging.getLogger(__name__).exception(
-                        'Error in city_removed handler'
-                    )
+                    logging.getLogger(__name__).exception('Error in city_removed handler')
 
-            self.sim.register_hook('city_removed', _on_city_removed)
+            self.sim.register_hook(hook_name='city_removed', func=_on_city_removed)
         except Exception:
             logging.getLogger(__name__).exception('Failed registering city_removed hook')
 
-        self.active_keys = set()
-        self.view_mode = 'terrain'
+        self.active_keys: set = set()
+        self.view_mode: str = 'terrain'
 
         self.hovered_hex: Optional[Hex] = None
 
@@ -185,7 +183,7 @@ class Window(arcade.Window):
                         dx: int,
                         dy: int
                         ):
-        world_pos = self.camera_controller.world_camera.unproject((x, y))
+        world_pos = self.camera_controller.world_camera.unproject(screen_coordinate=(x, y))
         self.hovered_hex = self.layout.pixel_to_hex(x=world_pos[0], y=world_pos[1])
 
     def on_update(self,
@@ -197,8 +195,7 @@ class Window(arcade.Window):
                 self.sim.tick()
                 self._sim_time_acc -= self.sim.tick_length
         except Exception:
-            import logging as _logging
-            _logging.getLogger(__name__).exception('Simulation tick error')
+            logging.getLogger(__name__).exception('Simulation tick error')
 
         if getattr(self, '_needs_rebuild', False):
             try:
@@ -214,12 +211,11 @@ class Window(arcade.Window):
                     except Exception:
                         self.drawer.build_geometry(world_map=self.world_map)
 
-                    self._removed_hexes_acc = []
+                    self._removed_hexes_acc = list()
                 else:
                     self.drawer.build_geometry(world_map=self.world_map)
             except Exception:
-                import logging as _logging
-                _logging.getLogger(__name__).exception('Error rebuilding geometry')
+                logging.getLogger(__name__).exception('Error rebuilding geometry')
             finally:
                 self._needs_rebuild = False
 

@@ -4,9 +4,12 @@ from typing import Optional
 from nodos.core.graph import InfrastructureGraph
 from nodos.core.hex_math import Hex
 from nodos.world.terrain import TerrainGenerator
-from nodos.world.zones import CityBuilderEngine
+from nodos.world.zones import City, CityBuilderEngine
 
-from nodos.config import MAP_HEIGHT, MAP_WIDTH
+from nodos.config import (
+    MAP_HEIGHT,
+    MAP_WIDTH
+)
 
 
 class HexTile:
@@ -35,18 +38,18 @@ class WorldMap:
         self.width = width
         self.height = height
 
-        self.terrain_gen = TerrainGenerator()
-        self.city_engine = CityBuilderEngine()
-        self.infra_graph = InfrastructureGraph()
+        self.terrain_gen: TerrainGenerator = TerrainGenerator()
+        self.city_engine: CityBuilderEngine = CityBuilderEngine()
+        self.infra_graph: InfrastructureGraph = InfrastructureGraph()
 
         cities_list = self.city_engine.generate_cities(tiles=self.tiles)
-        self.cities = {c.id_num: c for c in cities_list}
+        self.cities: dict[int, City] = {c.id_num: c for c in cities_list}
 
         self.infra_graph.build_regional_network(tiles=self.tiles, cities=cities_list)
 
     @cached_property
     def tiles(self) -> dict[Hex, HexTile]:
-        tiles = dict()
+        tiles: dict[Hex, HexTile] = dict()
         for r in range(self.height):
             r_offset = r // 2
             for col in range(self.width):

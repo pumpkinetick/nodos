@@ -5,10 +5,13 @@ from arcade.shape_list import (
     create_polygon
 )
 
-from nodos.core.hex_math import HexLayout, Hex
+from nodos.core.hex_math import Hex, HexLayout
 from nodos.world.map import HexTile, WorldMap
 
-from nodos.config import POINTY_TOP_DIRECTIONS, ZONE_COLORS
+from nodos.config import (
+    POINTY_TOP_DIRECTIONS,
+    ZONE_COLORS
+)
 
 
 class HexBatchDrawer:
@@ -17,10 +20,10 @@ class HexBatchDrawer:
                  ):
         self.layout = layout
 
-        self.terrain_shapes = ShapeElementList()
-        self.zoning_shapes = ShapeElementList()
-        self.road_shapes = ShapeElementList()
-        self.border_shapes = ShapeElementList()
+        self.terrain_shapes: ShapeElementList = ShapeElementList()
+        self.zoning_shapes: ShapeElementList = ShapeElementList()
+        self.road_shapes: ShapeElementList = ShapeElementList()
+        self.border_shapes: ShapeElementList = ShapeElementList()
 
         self._terrain_base_map: dict[Hex, list] = dict()
         self._terrain_overlay_map: dict[Hex, list] = dict()
@@ -53,7 +56,7 @@ class HexBatchDrawer:
                 world_map=world_map
             )
 
-            b_shapes = list()
+            b_shapes: list = list()
             if tile.city_id is not None:
                 b_shapes = self._bake_tile_borders(
                     hex_obj=tile.hex_obj,

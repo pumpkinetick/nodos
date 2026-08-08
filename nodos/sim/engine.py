@@ -43,7 +43,7 @@ class Simulation:
 
     @cached_property
     def city_states(self) -> dict[int, dict[str, Any]]:
-        states = dict()
+        states: dict[int, dict[str, Any]] = dict()
         for cid, city in self.world.cities.items():
             states[cid] = self._default_city_state()
         return states
@@ -113,9 +113,7 @@ class Simulation:
             try:
                 fn(self)
             except Exception:
-                logger.exception(
-                    'Error in pre_tick hook %s', fn
-                )
+                logger.exception('Error in pre_tick hook %s', fn)
 
         for cid, city in list(self.world.cities.items()):
             state = self.city_states.get(cid)
@@ -127,24 +125,18 @@ class Simulation:
                 try:
                     fn(self, city, state)
                 except Exception:
-                    logger.exception(
-                        'Error in city_tick hook %s for city %d', fn, cid
-                    )
+                    logger.exception('Error in city_tick hook %s for city %d', fn, cid)
 
             try:
                 self._apply_metric_updates(city, state)
             except Exception:
-                logger.exception(
-                    'Error applying metric updates for city %s', cid
-                )
+                logger.exception('Error applying metric updates for city %s', cid)
 
         for fn in list(self.hooks['post_tick']):
             try:
                 fn(self)
             except Exception:
-                logger.exception(
-                    'Error in post_tick hook %s', fn
-                )
+                logger.exception('Error in post_tick hook %s', fn)
 
         self.current_tick += 1
         self.time += float(self.tick_length)
@@ -205,9 +197,7 @@ class Simulation:
                         tile.zone_color = None
                         removed_hexes.append(hex_obj)
         except Exception:
-            logger.exception(
-                'Error clearing tiles for removed city %s', city_id
-            )
+            logger.exception('Error clearing tiles for removed city %s', city_id)
 
         self.world.cities.pop(city_id, None)
         self.city_states.pop(city_id, None)
@@ -216,14 +206,10 @@ class Simulation:
             if city is not None and hasattr(city, 'center'):
                 self.world.infra_graph.remove_city_connections(center=city.center)
         except Exception:
-            logger.exception(
-                'Error removing infrastructure edges for city %s', city_id
-            )
+            logger.exception('Error removing infrastructure edges for city %s', city_id)
 
         for fn in list(self.hooks.get('city_removed', [])):
             try:
                 fn(self, city_id, removed_hexes)
             except Exception:
-                logger.exception(
-                    'Error in city_removed hook %s', fn
-                )
+                logger.exception('Error in city_removed hook %s', fn)

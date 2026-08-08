@@ -1,7 +1,11 @@
 import math
 from functools import cached_property
 
-from nodos.config import HEX_SIZE, ORIGIN_X, ORIGIN_Y
+from nodos.config import (
+    HEX_SIZE,
+    ORIGIN_X,
+    ORIGIN_Y
+)
 
 
 class Hex:
@@ -68,7 +72,7 @@ class HexLayout:
             return corners
 
         center_x, center_y = self.hex_to_pixel(hex_obj=hex_obj)
-        corners = list()
+        corners: list[tuple[float, float]] = list()
         for i in range(6):
             angle_rad = math.pi / 180.0 * (60 * i + 30)
             x = center_x + self.size * math.cos(angle_rad)
