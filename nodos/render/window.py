@@ -82,6 +82,10 @@ class Window(arcade.Window):
             for i in range(4)
         ]
 
+    def queue_city_creation_updates(self):
+        self._removed_hexes_acc = list()
+        self._needs_rebuild = True
+
     def queue_city_removal_updates(self,
                                    removed_hexes: list[Hex]
                                    ):

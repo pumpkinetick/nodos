@@ -35,6 +35,7 @@ class Simulation:
             'pre_tick': list(),
             'post_tick': list(),
             'city_tick': list(),
+            'city_added': list(),
             'city_removed': list()
         }
 
@@ -68,6 +69,16 @@ class Simulation:
         if hook_name not in self.hooks:
             raise KeyError(f'Unknown hook name: {hook_name}')
         self.hooks[hook_name].append(func)
+
+    def _notify_city_added(self,
+                           city: City,
+                           state: dict[str, Any]
+                           ):
+        for fn in list(self.hooks.get('city_added', list())):
+            try:
+                fn(self, city, state)
+            except Exception:
+                logger.exception('Error in city_added hook %s', fn)
 
     def unregister_hook(self,
                         hook_name: str,
@@ -176,10 +187,13 @@ class Simulation:
         self.city_states[city_id] = state
 
     def add_city(self,
-                 city: City
+                 city: City,
+                 state: Optional[dict[str, Any]] = None
                  ):
+        city_state = state if state is not None else self.default_city_state()
         self.world.cities[city.id_num] = city
-        self.city_states[city.id_num] = self.default_city_state()
+        self.city_states[city.id_num] = city_state
+        self._notify_city_added(city=city, state=city_state)
 
     def remove_city(self,
                     city_id: int
@@ -215,7 +229,7 @@ class Simulation:
         except Exception:
             logger.exception('Error removing infrastructure edges for city %s', city_id)
 
-        for fn in list(self.hooks.get('city_removed', [])):
+        for fn in list(self.hooks.get('city_removed', list())):
             try:
                 fn(self, city_id, removed_hexes)
             except Exception:

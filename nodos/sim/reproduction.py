@@ -13,7 +13,7 @@ from nodos.config import (
     DEFAULT_REPRODUCTION_COOLDOWN,
     DEFAULT_RESOURCES,
     HEX_DIRECTIONS,
-    REPRODUCTION_COST,
+    REPRODUCTION_RESOURCE_COST,
     REPRODUCTION_THRESHOLD,
     ZONE_COLORS
 )
@@ -42,22 +42,24 @@ class ReproductionSystem:
 
         pop = float(state.get('population', DEFAULT_POPULATION))
         res = float(state.get('resources', DEFAULT_RESOURCES))
-        if pop < REPRODUCTION_THRESHOLD or res < REPRODUCTION_COST:
+        if pop < REPRODUCTION_THRESHOLD or res < REPRODUCTION_RESOURCE_COST:
             return
 
         offspring_center = self._find_reproduction_hex(city=city)
         if offspring_center is None:
             return
 
-        child_transfer_pop = min(pop * 0.5, pop) # to config
-        child_transfer_res = min(res * 0.5, res) # to config
+        child_transfer_pop = min(pop * 0.1, pop) # to config
+        child_transfer_res = min(res * 0.1, res) # to config
+
+        child_state = self.simulation.default_city_state()
+        child_state['population'] = child_transfer_pop
+        child_state['happiness'] = DEFAULT_HAPPINESS
+        child_state['resources'] = child_transfer_res
+        child_state['development'] = DEFAULT_DEVELOPMENT
 
         child_city = self._create_child_city(center_hex=offspring_center)
-        child_state = self.simulation.city_states[child_city.id_num]
-        child_state['population'] = child_transfer_pop
-        child_state['resources'] = child_transfer_res
-        child_state['happiness'] = DEFAULT_HAPPINESS
-        child_state['development'] = DEFAULT_DEVELOPMENT
+        self.simulation.add_city(city=child_city, state=child_state)
 
         state['population'] = max(0.0, pop - child_transfer_pop)
         state['resources'] = max(0.0, res - child_transfer_res)
@@ -68,15 +70,13 @@ class ReproductionSystem:
             getattr(city, 'name', ''),
             city.id_num,
             getattr(child_city, 'name', ''),
-            child_city.id_num,
+            child_city.id_num
         )
 
     def _create_child_city(self,
                            center_hex: Hex
                            ) -> City:
         child_city = self._make_city(center_hex=center_hex)
-        self.simulation.world.cities[child_city.id_num] = child_city
-        self.simulation.city_states[child_city.id_num] = self.simulation.default_city_state()
         self._claim_city_tiles(city=child_city, center_hex=center_hex)
         return child_city
 
