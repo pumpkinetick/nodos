@@ -3,14 +3,14 @@ import arcade
 
 class CameraController:
     def __init__(self):
-        self.world_camera = arcade.Camera2D()
+        self.world_camera: arcade.Camera2D = arcade.Camera2D()
 
-        self.base_pan_speed = 400.0
+        self.base_pan_speed: float = 400.0
 
-        self.min_zoom = 0.1
-        self.max_zoom = 3.0
-        self.target_zoom = 1.0
-        self.zoom_speed = 8.0
+        self.min_zoom: float = 0.1
+        self.max_zoom: float = 3.0
+        self.target_zoom: float = 1.0
+        self.zoom_speed: float = 8.0
 
     def use_world(self):
         self.world_camera.use()

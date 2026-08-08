@@ -1,4 +1,4 @@
-import opensimplex
+from opensimplex import OpenSimplex
 
 from nodos.config import (
     BIOMES,
@@ -18,7 +18,7 @@ class TerrainGenerator:
                  persistence: float = NOISE_PERSISTENCE,
                  lacunarity: float = NOISE_LACUNARITY
                  ):
-        self.noise = opensimplex.OpenSimplex(seed=seed)
+        self.noise: OpenSimplex = OpenSimplex(seed=seed)
         self.scale = scale
         self.octaves = octaves
         self.persistence = persistence

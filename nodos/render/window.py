@@ -1,10 +1,16 @@
+import logging
 from typing import Optional
+
 import arcade
+from arcade.shape_list import ShapeElementList
 
 from nodos.core.hex_math import Hex, HexLayout
 from nodos.render.camera import CameraController
 from nodos.render.drawer import HexBatchDrawer
+from nodos.sim.engine import Simulation
 from nodos.world.map import WorldMap
+
+logger = logging.getLogger(__name__)
 
 
 class Window(arcade.Window):
@@ -22,17 +28,37 @@ class Window(arcade.Window):
 
         arcade.set_background_color(arcade.color.CHARCOAL)
 
-        self.layout = HexLayout()
-        self.world_map = WorldMap()
-        self.camera_controller = CameraController()
+        self.layout: HexLayout = HexLayout()
+        self.world_map: WorldMap = WorldMap()
 
-        self.gui_camera = arcade.Camera2D()
+        self.sim: Simulation = Simulation(world=self.world_map)
+        self._sim_time_acc: float = 0.0
 
-        self.drawer = HexBatchDrawer(layout=self.layout)
+        self.camera_controller: CameraController = CameraController()
+
+        self.gui_camera: arcade.Camera2D = arcade.Camera2D()
+
+        self.drawer: HexBatchDrawer = HexBatchDrawer(layout=self.layout)
         self.drawer.build_geometry(world_map=self.world_map)
 
-        self.active_keys = set()
-        self.view_mode = 'terrain'
+        self._needs_rebuild: bool = False
+        self._removed_hexes_acc: list[Hex] = list()
+
+        try:
+            def _on_city_removed(sim_obj, city_id, removed_hexes):
+                try:
+                    if removed_hexes:
+                        self._removed_hexes_acc.extend(removed_hexes)
+                        self._needs_rebuild = True
+                except Exception:
+                    logger.exception('Error in city_removed handler')
+
+            self.sim.register_hook(hook_name='city_removed', func=_on_city_removed)
+        except Exception:
+            logger.exception('Failed registering city_removed hook')
+
+        self.active_keys: set = set()
+        self.view_mode: str = 'terrain'
 
         self.hovered_hex: Optional[Hex] = None
 
@@ -43,7 +69,7 @@ class Window(arcade.Window):
             font_size=14, bold=True
         )
 
-        self.hud_text_objs = [
+        self.hud_left_text_objs = [
             arcade.Text(
                 text='',
                 x=30, y=30 + i * 20,
@@ -51,6 +77,15 @@ class Window(arcade.Window):
                 font_size=12
             )
             for i in range(3)
+        ]
+        self.hud_right_text_objs = [
+            arcade.Text(
+                text='',
+                x=30, y=30 + i * 20,
+                color=arcade.color.WHITE,
+                font_size=12
+            )
+            for i in range(4)
         ]
 
     def on_draw(self):
@@ -61,31 +96,57 @@ class Window(arcade.Window):
 
         self.gui_camera.use()
 
-        self.mode_text_obj.text = (
+        base = (
             "View: TERRAIN (Press 'Z' to toggle)"
             if self.view_mode == 'terrain'
             else "View: ZONING (Press 'Z' to toggle)"
         )
+        tick_info = f' | Tick: {self.sim.current_tick}' if hasattr(self, 'sim') else ''
+        self.mode_text_obj.text = base + tick_info
         self.mode_text_obj.draw()
 
         if self.hovered_hex:
             tile = self.world_map.get_tile(hex_obj=self.hovered_hex)
             if tile:
-                info_lines = [
-                    f'Biome: {tile.biome.title()}'
-                ]
-                if tile.city_id is not None:
+                left_lines = [f'Biome: {tile.biome.title()}']
+                right_lines: list[str] = list()
+
+                if tile.city_id is not None and tile.city_id in self.world_map.cities:
                     city = self.world_map.cities[tile.city_id]
-                    info_lines.append(f'City: {city.name}')
-                    info_lines.append(f'District: {tile.zone_type.title()}')
+                    left_lines.append(f'City: {city.name}')
+                    left_lines.append(f'District: {tile.zone_type.title()}')
+
+                    state = None
+                    if hasattr(self, 'sim'):
+                        try:
+                            state = self.sim.get_city_state(city.id_num)
+                        except Exception:
+                            state = None
+
+                    if state:
+                        pop = int(state.get('population', 0))
+                        res = int(state.get('resources', 0))
+                        happiness = float(state.get('happiness', 0.0))
+                        development = float(state.get('development', 0.0))
+                        right_lines = [
+                            f'Population: {pop}',
+                            f'Resources: {res}',
+                            f'Happiness: {happiness:+.2f}',
+                            f'Development: {development:+.2f}'
+                        ]
+                else:
+                    left_lines.append('No city')
 
                 world_x, world_y = self.layout.hex_to_pixel(hex_obj=self.hovered_hex)
                 screen_pos = self.camera_controller.world_camera.project((world_x, world_y))
 
                 line_height = 18
                 padding = 10
-                box_width = 180
-                box_height =  len(info_lines) * line_height + padding * 2
+                col_spacing = 10
+                left_col_width = 150
+                right_col_width = 150
+                box_width = left_col_width + col_spacing + right_col_width
+                box_height = max(len(left_lines), len(right_lines)) * line_height + padding * 2
                 box_x = screen_pos[0]
                 box_y = screen_pos[1] + 25.0
 
@@ -100,11 +161,20 @@ class Window(arcade.Window):
                     color=(0, 0, 0, 190)
                 )
 
-                for i, line in enumerate(info_lines):
-                    text_obj = self.hud_text_objs[i]
+                for i, line in enumerate(left_lines):
+                    text_obj = self.hud_left_text_objs[i]
 
                     text_obj.text = line
                     text_obj.x = box_x - box_width / 2 + padding
+                    text_obj.y = box_y + box_height - padding - (i + 1) * line_height
+                    text_obj.anchor_y = 'bottom'
+                    text_obj.draw()
+
+                for i, line in enumerate(right_lines):
+                    text_obj = self.hud_right_text_objs[i]
+
+                    text_obj.text = line
+                    text_obj.x = box_x - box_width / 2 + padding + left_col_width + col_spacing
                     text_obj.y = box_y + box_height - padding - (i + 1) * line_height
                     text_obj.anchor_y = 'bottom'
                     text_obj.draw()
@@ -115,12 +185,45 @@ class Window(arcade.Window):
                         dx: int,
                         dy: int
                         ):
-        world_pos = self.camera_controller.world_camera.unproject((x, y))
+        world_pos = self.camera_controller.world_camera.unproject(screen_coordinate=(x, y))
         self.hovered_hex = self.layout.pixel_to_hex(x=world_pos[0], y=world_pos[1])
 
     def on_update(self,
                   delta_time: float
                   ):
+        self._sim_time_acc += delta_time
+        try:
+            while self._sim_time_acc >= self.sim.tick_length:
+                self.sim.tick()
+                self._sim_time_acc -= self.sim.tick_length
+        except Exception:
+            logger.exception('Simulation tick error')
+
+        if getattr(self, '_needs_rebuild', False):
+            try:
+                if getattr(self, '_removed_hexes_acc', None):
+                    try:
+                        self.drawer.remove_tiles(
+                            hexes=self._removed_hexes_acc,
+                            world_map=self.world_map
+                        )
+                    except Exception:
+                        self.drawer.build_geometry(world_map=self.world_map)
+
+                    try:
+                        self.drawer.road_shapes = ShapeElementList()
+                        self.drawer.bake_roads(world_map=self.world_map)
+                    except Exception:
+                        self.drawer.build_geometry(world_map=self.world_map)
+
+                    self._removed_hexes_acc = list()
+                else:
+                    self.drawer.build_geometry(world_map=self.world_map)
+            except Exception:
+                logger.exception('Error rebuilding geometry')
+            finally:
+                self._needs_rebuild = False
+
         self.camera_controller.update(delta_time=delta_time, active_keys=self.active_keys)
 
     def on_mouse_scroll(self,

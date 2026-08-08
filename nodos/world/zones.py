@@ -1,5 +1,6 @@
 import math
 import random
+from typing import Optional
 
 from nodos.core.hex_math import Hex
 
@@ -22,9 +23,9 @@ class City:
         self.id_num = id_num
         self.center = center
 
-        self.name = f'{random.choice(NAME_PREFIXES)}{random.choice(NAME_SUFFIXES)}'
+        self.name: str = f'{random.choice(NAME_PREFIXES)}{random.choice(NAME_SUFFIXES)}'
 
-        self.color = (
+        self.color: tuple[int, int, int, int] = (
             random.randint(a=50, b=220),
             random.randint(a=50, b=220),
             random.randint(a=50, b=220),
@@ -51,15 +52,15 @@ class CityBuilderEngine:
             min_distance=MIN_CITY_DISTANCE
         )
 
-        cities = list()
+        cities: list[City] = list()
         for i, center_hex in enumerate(seed_hexes, start=1):
             city = City(
                 id_num=i,
                 center=center_hex
             )
 
-            frontier = [center_hex]
-            visited = {center_hex}
+            frontier: list[Hex] = [center_hex]
+            visited: set[Hex] = {center_hex}
 
             tiles[center_hex].city_id = city.id_num
             tiles[center_hex].zone_type = 'center'
@@ -97,17 +98,19 @@ class CityBuilderEngine:
     @classmethod
     def _select_spread_seeds(cls,
                              buildable_hexes: list[Hex],
-                             min_distance: int
+                             min_distance: int,
+                             candidates: Optional[list[Hex]] = None
                              ) -> list[Hex]:
-        candidates = buildable_hexes.copy()
-        random.shuffle(candidates)
+        if candidates is None:
+            candidates = buildable_hexes.copy()
+            random.shuffle(candidates)
 
-        selected_seeds = list()
+        selected_seeds: list[Hex] = list()
         for candidate in candidates:
             if len(selected_seeds) >= INIT_NUM_CITIES:
                 break
 
-            is_valid_location = True
+            is_valid_location: bool = True
             for seed in selected_seeds:
                 if candidate.distance_to(other=seed) < min_distance:
                     is_valid_location = False
@@ -119,7 +122,8 @@ class CityBuilderEngine:
         if len(selected_seeds) < INIT_NUM_CITIES and min_distance > CITY_EXPANSION_STEPS:
             return cls._select_spread_seeds(
                 buildable_hexes=buildable_hexes,
-                min_distance=min_distance - 1
+                min_distance=min_distance - 1,
+                candidates=candidates
             )
 
         return selected_seeds
