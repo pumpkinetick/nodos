@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Callable, Optional
 if TYPE_CHECKING:
     from nodos.core.hex_math import HexObject
     from nodos.render import SimulationWindow
-    from nodos.sim import SimulationEngine
+    from nodos.simulation import SimulationEngine
 
 logger = logging.getLogger(__name__)
 

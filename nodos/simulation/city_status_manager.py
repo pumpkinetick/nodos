@@ -13,7 +13,7 @@ from nodos.config import (
 )
 
 if TYPE_CHECKING:
-    from nodos.sim import SimulationEngine
+    from nodos.simulation import SimulationEngine
     from nodos.world.cities import City
 
 logger = logging.getLogger(__name__)

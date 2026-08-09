@@ -2,7 +2,7 @@ import logging
 from typing import Any, Callable, Optional
 
 from nodos.core.hex_math import HexObject
-from nodos.sim import CityStatusManager, ReproductionSystem, SimulationClock
+from nodos.simulation import CityStatusManager, ReproductionSystem, SimulationClock
 from nodos.world.cities import City
 from nodos.world.map import WorldMap
 

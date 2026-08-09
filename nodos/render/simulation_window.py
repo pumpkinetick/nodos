@@ -5,8 +5,8 @@ import arcade
 
 from nodos.core.hex_math import HexLayout, HexObject
 from nodos.render import *
-from nodos.sim import HookManager
-from nodos.sim import SimulationEngine
+from nodos.simulation import HookManager
+from nodos.simulation import SimulationEngine
 from nodos.world.map import WorldMap
 
 logger = logging.getLogger(__name__)

@@ -1,6 +1,9 @@
-from arcade.shape_list import ShapeElementList, create_line_strip, create_polygon
+from arcade.shape_list import Shape, ShapeElementList, create_polygon
 
+from nodos.core.hex_math import HexLayout, HexObject
 from nodos.render.layers import RenderLayer
+from nodos.render.utilities import create_hex_shapes, darken_color
+from nodos.world.map import WorldMap
 
 from nodos.config import (
     ZONE_COLORS
@@ -8,27 +11,27 @@ from nodos.config import (
 
 
 class TerrainLayer(RenderLayer):
-    def __init__(self, layout):
+    def __init__(self, layout: HexLayout):
         self.layout = layout
-        self.shapes = ShapeElementList()
-        self._base_map = {}
-        self._overlay_map = {}
 
-    def build(self, world_map):
+        self.shapes: ShapeElementList = ShapeElementList()
+        self._base_map: dict[HexObject, list[Shape]] = dict()
+        self._overlay_map: dict[HexObject, list[Shape]] = dict()
+
+    def build(self, world_map: WorldMap):
+        self.shapes = ShapeElementList()
         self._base_map.clear()
         self._overlay_map.clear()
-        self.shapes = ShapeElementList()
 
         for hex_obj, tile in world_map.tiles.items():
             corners = self.layout.polygon_corners(hex_obj=hex_obj)
-            
-            # Bake terrain tile logic
-            t_border = self._darken_color(color=tile.color, amount=25)
-            base_shapes = self._create_hex_shapes(
+
+            t_border = darken_color(color=tile.color, amount=25)
+            base_shapes = create_hex_shapes(
                 corners=corners, fill_color=tile.color, border_color=t_border, line_width=1.0
             )
 
-            overlay_shapes = []
+            overlay_shapes: list[Shape] = list()
             if tile.city_id is not None:
                 city = world_map.cities[tile.city_id]
                 c_fill = (ZONE_COLORS['center'] if tile.zone_type == 'center' else city.color)
@@ -47,8 +50,8 @@ class TerrainLayer(RenderLayer):
     def remove_tiles(self, hexes):
         for h in hexes:
             self._overlay_map.pop(h, None)
-        
         self.shapes = ShapeElementList()
+
         for shapes in self._base_map.values():
             for s in shapes:
                 self.shapes.append(s)
@@ -58,13 +61,3 @@ class TerrainLayer(RenderLayer):
 
     def draw(self):
         self.shapes.draw()
-
-    @staticmethod
-    def _darken_color(color, amount):
-        return max(0, color[0] - amount), max(0, color[1] - amount), max(0, color[2] - amount), 255
-
-    @staticmethod
-    def _create_hex_shapes(corners, fill_color, border_color, line_width=1.0):
-        poly = create_polygon(point_list=corners, color=fill_color)
-        border = create_line_strip(point_list=corners + [corners[0]], color=border_color, line_width=line_width)
-        return [poly, border]
