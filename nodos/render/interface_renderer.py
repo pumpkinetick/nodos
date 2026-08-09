@@ -12,7 +12,8 @@ if TYPE_CHECKING:
 class InterfaceRenderer:
     def __init__(self, window: SimulationWindow):
         self.window = window
-        self.gui_camera = arcade.Camera2D()
+
+        self.gui_camera: arcade.Camera2D = arcade.Camera2D()
 
         self.mode_text_obj = arcade.Text(
             text='',
@@ -30,10 +31,17 @@ class InterfaceRenderer:
             for i in range(4)
         ]
 
-    def draw(self, view_mode: str, current_tick: int, hovered_hex: Optional['HexObject']):
+    def draw(self,
+             view_mode: str,
+             current_tick: int,
+             hovered_hex: Optional[HexObject]
+             ):
         self.gui_camera.use()
 
-        base = "View: TERRAIN (Press 'Z' to toggle)" if view_mode == 'terrain' else "View: ZONING (Press 'Z' to toggle)"
+        base = (
+            "View: TERRAIN (Press 'Z' to toggle)" if view_mode == 'terrain'
+            else "View: ZONING (Press 'Z' to toggle)"
+        )
         self.mode_text_obj.text = f"{base} | Tick: {current_tick}"
         self.mode_text_obj.draw()
 
@@ -46,7 +54,7 @@ class InterfaceRenderer:
             return
 
         left_lines = [f'Biome: {tile.biome.title()}']
-        right_lines = []
+        right_lines: list[str] = list()
 
         if tile.city_id is not None and tile.city_id in self.window.world_map.cities:
             city = self.window.world_map.cities[tile.city_id]

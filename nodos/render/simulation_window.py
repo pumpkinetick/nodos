@@ -13,8 +13,14 @@ logger = logging.getLogger(__name__)
 
 
 class SimulationWindow(arcade.Window):
-    def __init__(self, width: int, height: int, title: str):
-        super().__init__(width=width, height=height, title=title, resizable=False)
+    def __init__(self,
+                 width: int,
+                 height: int,
+                 title: str
+                 ):
+        super().__init__(
+            width=width, height=height, title=title, resizable=False
+        )
         arcade.set_background_color(arcade.color.CHARCOAL)
 
         self.layout = HexLayout()
@@ -30,7 +36,7 @@ class SimulationWindow(arcade.Window):
         self.input_handler = InputHandler(window=self)
 
         self._needs_rebuild = False
-        self._removed_hexes_acc = []
+        self._removed_hexes_acc: list[HexObject] = list()
 
         try:
             self.sim_hooks = HookManager(window=self)
@@ -42,7 +48,7 @@ class SimulationWindow(arcade.Window):
         self.hovered_hex: Optional[HexObject] = None
 
     def queue_city_creation_updates(self):
-        self._removed_hexes_acc = []
+        self._removed_hexes_acc = list()
         self._needs_rebuild = True
 
     def queue_city_removal_updates(self, removed_hexes: list[HexObject]):
@@ -60,8 +66,15 @@ class SimulationWindow(arcade.Window):
             hovered_hex=self.hovered_hex
         )
 
-    def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
-        self.input_handler.on_mouse_motion(x, y, dx, dy)
+    def on_mouse_motion(self,
+                        x: int,
+                        y: int,
+                        dx: int,
+                        dy: int
+                        ):
+        self.input_handler.on_mouse_motion(
+            x=x, y=y, dx=dx, dy=dy
+        )
 
     def on_update(self, delta_time: float):
         self._sim_time_acc += delta_time
@@ -75,14 +88,14 @@ class SimulationWindow(arcade.Window):
         if self._needs_rebuild:
             self._handle_rebuild()
 
-        self.input_handler.update_camera(delta_time)
+        self.input_handler.update_camera(delta_time=delta_time)
 
     def _handle_rebuild(self):
         try:
             if self._removed_hexes_acc:
                 self.drawer.remove_tiles(hexes=self._removed_hexes_acc, world_map=self.world_map)
                 self.drawer.bake_roads(world_map=self.world_map)
-                self._removed_hexes_acc = []
+                self._removed_hexes_acc = list()
             else:
                 self.drawer.build_geometry(world_map=self.world_map)
         except Exception:
@@ -91,11 +104,24 @@ class SimulationWindow(arcade.Window):
         finally:
             self._needs_rebuild = False
 
-    def on_mouse_scroll(self, x: int, y: int, scroll_x: int, scroll_y: int):
-        self.input_handler.on_mouse_scroll(x, y, scroll_x, scroll_y)
+    def on_mouse_scroll(self,
+                        x: int,
+                        y: int,
+                        scroll_x: int,
+                        scroll_y: int
+                        ):
+        self.input_handler.on_mouse_scroll(
+            x=x, y=y, scroll_x=scroll_x, scroll_y=scroll_y
+        )
 
-    def on_key_press(self, symbol: int, modifiers: int):
-        self.input_handler.on_key_press(symbol, modifiers)
+    def on_key_press(self,
+                     symbol: int,
+                     modifiers: int
+                     ):
+        self.input_handler.on_key_press(symbol=symbol, modifiers=modifiers)
 
-    def on_key_release(self, symbol: int, modifiers: int):
-        self.input_handler.on_key_release(symbol, modifiers)
+    def on_key_release(self,
+                       symbol: int,
+                       modifiers: int
+                       ):
+        self.input_handler.on_key_release(symbol=symbol, modifiers=modifiers)

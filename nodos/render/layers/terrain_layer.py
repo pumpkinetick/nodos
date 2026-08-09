@@ -47,7 +47,7 @@ class TerrainLayer(RenderLayer):
                 for s in overlay_shapes:
                     self.shapes.append(s)
 
-    def remove_tiles(self, hexes):
+    def remove_tiles(self, hexes: list[HexObject]):
         for h in hexes:
             self._overlay_map.pop(h, None)
         self.shapes = ShapeElementList()
