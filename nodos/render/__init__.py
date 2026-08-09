@@ -1,4 +1,4 @@
-from .camera import CameraController
+from .camera_controller import CameraController
 from .drawer import HexBatchDrawer
 from .window import Window
 
