@@ -3,7 +3,7 @@ from __future__ import annotations
 import networkx as nx
 from typing import TYPE_CHECKING
 
-from nodos.core.hex_math import Hex
+from nodos.core.hex_math import HexObject
 
 from nodos.config import (
     ELEVATION_FACTOR,
@@ -19,8 +19,8 @@ class InfrastructureGraph:
     def __init__(self):
         self.graph: nx.Graph = nx.Graph()
 
-        self.road_edges: list[tuple[Hex, Hex]] = list()
-        self.city_edge_map: dict[Hex, set[tuple[Hex, Hex]]] = dict()
+        self.road_edges: list[tuple[HexObject, HexObject]] = list()
+        self.city_edge_map: dict[HexObject, set[tuple[HexObject, HexObject]]] = dict()
 
     @staticmethod
     def _build_nav_graph(tiles: dict) -> nx.Graph:
@@ -33,7 +33,7 @@ class InfrastructureGraph:
             nav_graph.add_node(node_for_adding=hex_obj)
 
             for dq, dr in HEX_DIRECTIONS:
-                neighbor = Hex(q=hex_obj.q + dq, r=hex_obj.r + dr)
+                neighbor = HexObject(q=hex_obj.q + dq, r=hex_obj.r + dr)
                 if neighbor in tiles and tiles[neighbor].is_buildable:
                     elevation_diff = abs(hex_tile.elevation - tiles[neighbor].elevation)
                     nav_graph.add_edge(
@@ -86,14 +86,14 @@ class InfrastructureGraph:
                     continue
 
     def remove_city_connections(self,
-                                center: Hex
+                                center: HexObject
                                 ):
         owned_edges = self.city_edge_map.pop(center, set())
         if not owned_edges:
             return
         owned_set = set(owned_edges)
 
-        remaining_edges: list[tuple[Hex, Hex]] = list()
+        remaining_edges: list[tuple[HexObject, HexObject]] = list()
         for e in self.road_edges:
             if e in owned_set or (e[1], e[0]) in owned_set:
                 continue
@@ -114,8 +114,8 @@ class InfrastructureGraph:
                 self.graph.remove_node(node)
 
     def connect_cities(self,
-                       city_a_center: Hex,
-                       city_b_center: Hex,
+                       city_a_center: HexObject,
+                       city_b_center: HexObject,
                        tiles: dict
                        ) -> bool:
         nav_graph = self._build_nav_graph(tiles=tiles)

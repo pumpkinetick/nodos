@@ -1,11 +1,11 @@
 from typing import Optional
 
-from nodos.core.hex_math import Hex
+from nodos.core.hex_math import HexObject
 
 
 class HexTile:
     def __init__(self,
-                 hex_obj: Hex
+                 hex_obj: HexObject
                  ):
         self.hex_obj = hex_obj
 

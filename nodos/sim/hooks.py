@@ -4,7 +4,7 @@ import logging
 from typing import TYPE_CHECKING, Callable, Optional
 
 if TYPE_CHECKING:
-    from nodos.core.hex_math import Hex
+    from nodos.core.hex_math import HexObject
     from nodos.render import Window
     from nodos.sim import Simulation
 
@@ -69,7 +69,7 @@ class SimulationWindowHooks:
         def _on_city_removed(
             sim_obj: Simulation,
             city_id: int,
-            removed_hexes: list[Hex],
+            removed_hexes: list[HexObject],
         ):
             try:
                self.window.queue_city_removal_updates(removed_hexes=removed_hexes)

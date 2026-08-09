@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 
-class Hex:
+class HexObject:
     def __init__(self,
                  q: int,
                  r: int
@@ -13,7 +13,7 @@ class Hex:
     def __eq__(self,
                other: object
                ) -> bool:
-        if not isinstance(other, Hex):
+        if not isinstance(other, HexObject):
             return False
         return self.q == other.q and self.r == other.r
 
@@ -21,9 +21,9 @@ class Hex:
         return hash((self.q, self.r))
 
     def __repr__(self) -> str:
-        return f'Hex(q={self.q}, r={self.r})'
+        return f'HexObject(q={self.q}, r={self.r})'
 
     def distance_to(self,
-                    other: Hex
+                    other: HexObject
                     ) -> int:
         return (abs(self.q - other.q) + abs(self.r - other.r) + abs(self.s - other.s)) // 2

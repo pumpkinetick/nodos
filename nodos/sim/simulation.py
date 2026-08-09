@@ -2,7 +2,7 @@ import logging
 from functools import cached_property
 from typing import Any, Callable, Optional
 
-from nodos.core.hex_math import Hex
+from nodos.core.hex_math import HexObject
 from nodos.sim import ReproductionSystem
 from nodos.world.cities import City
 from nodos.world.map import WorldMap
@@ -199,7 +199,7 @@ class Simulation:
                     ):
         city = self.world.cities.get(city_id)
 
-        removed_hexes: list[Hex] = list()
+        removed_hexes: list[HexObject] = list()
         try:
             if city is not None and hasattr(city, 'districts'):
                 for hex_obj in list(city.districts.keys()):

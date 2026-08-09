@@ -2,7 +2,7 @@ import logging
 import math
 from typing import Optional
 
-from nodos.core.hex_math import Hex
+from nodos.core.hex_math import HexObject
 from nodos.world.cities import City
 
 from nodos.config import (
@@ -18,7 +18,7 @@ class CityInitializer:
     @staticmethod
     def create_single_cell_city_inplace(tiles: dict,
                                         city_id: int,
-                                        center_hex: Hex
+                                        center_hex: HexObject
                                         ) -> Optional[City]:
         tile = tiles.get(center_hex)
         if tile is None or not tile.is_buildable or tile.city_id is not None:
@@ -36,7 +36,7 @@ class CityInitializer:
     @staticmethod
     def create_expanded_city_inplace(tiles: dict,
                                      city_id: int,
-                                     center_hex: Hex
+                                     center_hex: HexObject
                                      ) -> Optional[City]:
         tile = tiles.get(center_hex)
         if tile is None or not tile.is_buildable or tile.city_id is not None:
@@ -44,8 +44,8 @@ class CityInitializer:
 
         city = City(id_num=city_id, center=center_hex)
 
-        frontier: list[Hex] = [center_hex]
-        visited: set[Hex] = {center_hex}
+        frontier: list[HexObject] = [center_hex]
+        visited: set[HexObject] = {center_hex}
 
         tile.city_id = city_id
         tile.zone_type = 'center'
@@ -55,7 +55,7 @@ class CityInitializer:
             next_frontier = list()
             for current_hex in frontier:
                 for dq, dr in HEX_DIRECTIONS:
-                    neighbor = Hex(q=current_hex.q + dq, r=current_hex.r + dr)
+                    neighbor = HexObject(q=current_hex.q + dq, r=current_hex.r + dr)
                     neighbor_tile = tiles.get(neighbor)
                     if (
                         neighbor_tile is not None and
@@ -83,7 +83,7 @@ class CityInitializer:
 
     @staticmethod
     def _determine_directional_zone(city: City,
-                                    hex_obj: Hex,
+                                    hex_obj: HexObject,
                                     distance: int
                                     ) -> str:
         if distance == 1:

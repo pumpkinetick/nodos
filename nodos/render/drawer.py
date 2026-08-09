@@ -9,7 +9,7 @@ from arcade.shape_list import (
     create_polygon
 )
 
-from nodos.core.hex_math import Hex, HexLayout
+from nodos.core.hex_math import HexLayout, HexObject
 
 from nodos.config import (
     POINTY_TOP_DIRECTIONS,
@@ -31,10 +31,10 @@ class HexBatchDrawer:
         self.road_shapes: ShapeElementList = ShapeElementList()
         self.border_shapes: ShapeElementList = ShapeElementList()
 
-        self._terrain_base_map: dict[Hex, list] = dict()
-        self._terrain_overlay_map: dict[Hex, list] = dict()
-        self._zoning_tile_map: dict[Hex, list] = dict()
-        self._border_tile_map: dict[Hex, list] = dict()
+        self._terrain_base_map: dict[HexObject, list] = dict()
+        self._terrain_overlay_map: dict[HexObject, list] = dict()
+        self._zoning_tile_map: dict[HexObject, list] = dict()
+        self._border_tile_map: dict[HexObject, list] = dict()
 
     def build_geometry(self,
                        world_map: WorldMap
@@ -94,7 +94,7 @@ class HexBatchDrawer:
         self.bake_roads(world_map=world_map)
 
     def remove_tiles(self,
-                     hexes: list[Hex],
+                     hexes: list[HexObject],
                      world_map: WorldMap
                      ):
         for h in hexes:
@@ -203,7 +203,7 @@ class HexBatchDrawer:
         return base_shapes, overlay_shapes
 
     def _bake_tile_borders(self,
-                           hex_obj: Hex,
+                           hex_obj: HexObject,
                            corners: list[tuple[float, float]],
                            tile: HexTile,
                            world_map: WorldMap
@@ -212,7 +212,7 @@ class HexBatchDrawer:
 
         border_list = list()
         for i, (dq, dr) in enumerate(POINTY_TOP_DIRECTIONS):
-            neighbor = world_map.get_tile(hex_obj=Hex(
+            neighbor = world_map.get_tile(hex_obj=HexObject(
                 q=hex_obj.q + dq, r=hex_obj.r + dr
             ))
 

@@ -4,7 +4,7 @@ import logging
 import random
 from typing import TYPE_CHECKING, Any
 
-from nodos.core.hex_math import Hex
+from nodos.core.hex_math import HexObject
 from nodos.world.cities import CityInitializer
 
 from nodos.config import (
@@ -89,14 +89,14 @@ class ReproductionSystem:
 
     def _find_reproduction_hex(self,
                                city: City
-                               ) -> Hex | None:
+                               ) -> HexObject | None:
         if not hasattr(city, 'districts'):
             return None
 
-        candidate_hexes: list[Hex] = list()
+        candidate_hexes: list[HexObject] = list()
         for hex_obj in list(city.districts.keys()):
             for dq, dr in HEX_DIRECTIONS:
-                candidate = Hex(q=hex_obj.q + dq, r=hex_obj.r + dr)
+                candidate = HexObject(q=hex_obj.q + dq, r=hex_obj.r + dr)
                 tile = self.simulation.world.tiles.get(candidate)
                 if tile and tile.is_buildable and getattr(tile, 'city_id', None) is None:
                     candidate_hexes.append(candidate)

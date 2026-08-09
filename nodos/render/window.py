@@ -4,7 +4,7 @@ from typing import Optional
 import arcade
 from arcade.shape_list import ShapeElementList
 
-from nodos.core.hex_math import Hex, HexLayout
+from nodos.core.hex_math import HexLayout, HexObject
 from nodos.render import CameraController
 from nodos.render import HexBatchDrawer
 from nodos.sim import Simulation
@@ -43,7 +43,7 @@ class Window(arcade.Window):
         self.drawer.build_geometry(world_map=self.world_map)
 
         self._needs_rebuild: bool = False
-        self._removed_hexes_acc: list[Hex] = list()
+        self._removed_hexes_acc: list[HexObject] = list()
 
         try:
             self.sim_hooks = SimulationWindowHooks(window=self)
@@ -54,7 +54,7 @@ class Window(arcade.Window):
         self.active_keys: set = set()
         self.view_mode: str = 'terrain'
 
-        self.hovered_hex: Optional[Hex] = None
+        self.hovered_hex: Optional[HexObject] = None
 
         self.mode_text_obj = arcade.Text(
             text='',
@@ -87,7 +87,7 @@ class Window(arcade.Window):
         self._needs_rebuild = True
 
     def queue_city_removal_updates(self,
-                                   removed_hexes: list[Hex]
+                                   removed_hexes: list[HexObject]
                                    ):
         if removed_hexes:
             self._removed_hexes_acc.extend(removed_hexes)

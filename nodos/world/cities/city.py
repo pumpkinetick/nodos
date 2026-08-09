@@ -1,7 +1,7 @@
 import math
 import random
 
-from nodos.core.hex_math import Hex
+from nodos.core.hex_math import HexObject
 
 from nodos.config import (
     NAME_PREFIXES,
@@ -12,7 +12,7 @@ from nodos.config import (
 class City:
     def __init__(self,
                  id_num: int,
-                 center: Hex
+                 center: HexObject
                  ):
         self.id_num = id_num
         self.center = center
@@ -27,4 +27,4 @@ class City:
         )
 
         self.industrial_angle: float = random.uniform(a=0.0, b=2.0 * math.pi)
-        self.districts: dict[Hex, str] = {center: 'center'}
+        self.districts: dict[HexObject, str] = {center: 'center'}

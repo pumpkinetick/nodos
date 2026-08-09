@@ -1,6 +1,6 @@
 import math
 
-from nodos.core.hex_math import Hex
+from nodos.core.hex_math import HexObject
 
 from nodos.config import (
     HEX_SIZE,
@@ -19,8 +19,8 @@ class HexLayout:
         self.origin_x = origin_x
         self.origin_y = origin_y
 
-        self._pixel_cache: dict[Hex, tuple[float, float]] = dict()
-        self._corner_cache: dict[Hex, list[tuple[float, float]]] = dict()
+        self._pixel_cache: dict[HexObject, tuple[float, float]] = dict()
+        self._corner_cache: dict[HexObject, list[tuple[float, float]]] = dict()
 
         self._corner_offsets: list[tuple[float, float]] = [
             (
@@ -31,7 +31,7 @@ class HexLayout:
         ]
 
     def hex_to_pixel(self,
-                     hex_obj: Hex
+                     hex_obj: HexObject
                      ) -> tuple[float, float]:
         p = self._pixel_cache.get(hex_obj)
         if p is not None:
@@ -43,7 +43,7 @@ class HexLayout:
         return x, y
 
     def polygon_corners(self,
-                        hex_obj: Hex
+                        hex_obj: HexObject
                         ) -> list[tuple[float, float]]:
         corners = self._corner_cache.get(hex_obj)
         if corners is not None:
@@ -64,7 +64,7 @@ class HexLayout:
     def pixel_to_hex(self,
                      x: float,
                      y: float
-                     ) -> Hex:
+                     ) -> HexObject:
         norm_x = (x - self.origin_x) / self.size
         norm_y = (y - self.origin_y) / self.size
 
@@ -78,7 +78,7 @@ class HexLayout:
     def _cube_round(q: float,
                     r: float,
                     s: float
-                    ) -> Hex:
+                    ) -> HexObject:
         rounded_q = round(q)
         rounded_r = round(r)
         rounded_s = round(s)
@@ -92,4 +92,4 @@ class HexLayout:
         elif r_diff > s_diff:
             rounded_r = -rounded_q - rounded_s
 
-        return Hex(q=rounded_q, r=rounded_r)
+        return HexObject(q=rounded_q, r=rounded_r)
