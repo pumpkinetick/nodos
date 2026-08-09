@@ -14,7 +14,7 @@ from nodos.world.map import WorldMap
 logger = logging.getLogger(__name__)
 
 
-class Window(arcade.Window):
+class SimulationWindow(arcade.Window):
     def __init__(self,
                  width: int,
                  height: int,

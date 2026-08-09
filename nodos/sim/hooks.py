@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Callable, Optional
 
 if TYPE_CHECKING:
     from nodos.core.hex_math import HexObject
-    from nodos.render import Window
+    from nodos.render import SimulationWindow
     from nodos.sim import Simulation
 
 logger = logging.getLogger(__name__)
@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 class SimulationWindowHooks:
     def __init__(self,
-                 window: Window
+                 window: SimulationWindow
                  ):
         self.window = window
         self._city_added_hook: Optional[Callable[..., None]] = None
