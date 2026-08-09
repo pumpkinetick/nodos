@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING, Callable, Optional
 
 if TYPE_CHECKING:
     from nodos.core.hex_math import Hex
-    from nodos.render.window import Window
-    from nodos.sim.engine import Simulation
+    from nodos.render import Window
+    from nodos.sim import Simulation
 
 logger = logging.getLogger(__name__)
 

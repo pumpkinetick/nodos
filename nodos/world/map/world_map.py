@@ -1,12 +1,11 @@
-from __future__ import annotations
-
 from functools import cached_property
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from nodos.core.graph import InfrastructureGraph
 from nodos.core.hex_math import Hex
-from nodos.world.terrain import TerrainGenerator
-from nodos.world.zones import CityBuilderEngine
+from nodos.world.cities import CityBuilderEngine
+from nodos.world.map import HexTile
+from nodos.world.map import TerrainGenerator
 
 from nodos.config import (
     MAP_HEIGHT,
@@ -14,26 +13,8 @@ from nodos.config import (
 )
 
 if TYPE_CHECKING:
-    from nodos.world.zones import City
+    from nodos.world.cities import City
 
-
-class HexTile:
-    def __init__(self,
-                 hex_obj: Hex
-                 ):
-        self.hex_obj = hex_obj
-
-        self.elevation: float = 0.0
-        self.biome: str = 'water'
-        self.color: tuple[int, int, int, int] = (0, 0, 0, 255)
-        self.is_buildable: bool = False
-
-        self.city_id: Optional[int] = None
-        self.zone_type: Optional[str] = None
-        self.zone_color: Optional[tuple[int, int, int, int]] = None
-
-    def __repr__(self):
-        return f'HexTile({self.hex_obj.q}, {self.hex_obj.r})'
 
 class WorldMap:
     def __init__(self,

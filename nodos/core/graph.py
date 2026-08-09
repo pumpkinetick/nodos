@@ -12,7 +12,7 @@ from nodos.config import (
 )
 
 if TYPE_CHECKING:
-    from nodos.world.zones import City
+    from nodos.world.cities import City
 
 
 class InfrastructureGraph:

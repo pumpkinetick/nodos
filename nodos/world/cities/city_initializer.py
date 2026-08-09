@@ -1,20 +1,15 @@
-from __future__ import annotations
-
 import logging
 import math
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 from nodos.core.hex_math import Hex
-from nodos.world.zones import City
+from nodos.world.cities import City
 
 from nodos.config import (
     CITY_EXPANSION_STEPS,
     HEX_DIRECTIONS,
-    ZONE_COLORS,
+    ZONE_COLORS
 )
-
-if TYPE_CHECKING:
-    pass
 
 logger = logging.getLogger(__name__)
 

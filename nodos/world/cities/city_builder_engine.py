@@ -1,4 +1,3 @@
-import math
 import random
 from typing import Optional
 
@@ -7,31 +6,8 @@ from nodos.core.hex_math import Hex
 from nodos.config import (
     CITY_EXPANSION_STEPS,
     INIT_NUM_CITIES,
-    MIN_CITY_DISTANCE,
-    NAME_PREFIXES,
-    NAME_SUFFIXES
+    MIN_CITY_DISTANCE
 )
-
-
-class City:
-    def __init__(self,
-                 id_num: int,
-                 center: Hex
-                 ):
-        self.id_num = id_num
-        self.center = center
-
-        self.name: str = f'{random.choice(NAME_PREFIXES)}{random.choice(NAME_SUFFIXES)}'
-
-        self.color: tuple[int, int, int, int] = (
-            random.randint(a=50, b=220),
-            random.randint(a=50, b=220),
-            random.randint(a=50, b=220),
-            180
-        )
-
-        self.industrial_angle: float = random.uniform(a=0.0, b=2.0 * math.pi)
-        self.districts: dict[Hex, str] = {center: 'center'}
 
 
 class CityBuilderEngine:
@@ -39,7 +15,7 @@ class CityBuilderEngine:
     def generate_cities(cls,
                         tiles: dict
                         ) -> list:
-        from nodos.world.city_init import CityInitializer
+        from nodos.world.cities import CityInitializer
 
         buildable_hexes = [h for h, t in tiles.items() if t.is_buildable]
 

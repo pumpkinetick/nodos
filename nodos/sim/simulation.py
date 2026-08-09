@@ -1,13 +1,11 @@
-from __future__ import annotations
-
 import logging
 from functools import cached_property
 from typing import Any, Callable, Optional
 
 from nodos.core.hex_math import Hex
-from nodos.sim.reproduction import ReproductionSystem
+from nodos.sim import ReproductionSystem
+from nodos.world.cities import City
 from nodos.world.map import WorldMap
-from nodos.world.zones import City
 
 from nodos.config import (
     DEATH_POPULATION_THRESHOLD,

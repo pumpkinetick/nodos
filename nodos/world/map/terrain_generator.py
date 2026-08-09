@@ -6,7 +6,7 @@ from nodos.config import (
     NOISE_OCTAVES,
     NOISE_PERSISTENCE,
     NOISE_SCALE,
-    NOISE_SEED,
+    NOISE_SEED
 )
 
 

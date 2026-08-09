@@ -5,7 +5,7 @@ import random
 from typing import TYPE_CHECKING, Any
 
 from nodos.core.hex_math import Hex
-from nodos.world.city_init import CityInitializer
+from nodos.world.cities import CityInitializer
 
 from nodos.config import (
     DEFAULT_DEVELOPMENT,
@@ -19,8 +19,8 @@ from nodos.config import (
 )
 
 if TYPE_CHECKING:
-    from nodos.sim.engine import Simulation
-    from nodos.world.zones import City
+    from nodos.sim import Simulation
+    from nodos.world.cities import City
 
 logger = logging.getLogger(__name__)
 

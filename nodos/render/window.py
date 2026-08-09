@@ -5,10 +5,10 @@ import arcade
 from arcade.shape_list import ShapeElementList
 
 from nodos.core.hex_math import Hex, HexLayout
-from nodos.render.camera import CameraController
-from nodos.render.drawer import HexBatchDrawer
-from nodos.sim.engine import Simulation
-from nodos.sim.hooks import SimulationWindowHooks
+from nodos.render import CameraController
+from nodos.render import HexBatchDrawer
+from nodos.sim import Simulation
+from nodos.sim import SimulationWindowHooks
 from nodos.world.map import WorldMap
 
 logger = logging.getLogger(__name__)
