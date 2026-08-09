@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 from nodos.core import RoadNetwork
 from nodos.core.hex_math import HexObject
-from nodos.world.cities import CityBuilderEngine
+from nodos.world.cities import CityInitializer
 from nodos.world.map import HexTile
 from nodos.world.map import TerrainGenerator
 
@@ -25,7 +25,7 @@ class WorldMap:
         self.height = height
 
         self.terrain_gen: TerrainGenerator = TerrainGenerator()
-        self.city_engine: CityBuilderEngine = CityBuilderEngine()
+        self.city_engine: CityInitializer = CityInitializer()
         self.road_network: RoadNetwork = RoadNetwork()
 
         cities_list = self.city_engine.generate_cities(tiles=self.tiles)

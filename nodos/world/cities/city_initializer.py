@@ -1,112 +1,74 @@
-import logging
-import math
+import random
 from typing import Optional
 
 from nodos.core.hex_math import HexObject
-from nodos.world.cities import City
 
 from nodos.config import (
     CITY_EXPANSION_STEPS,
-    HEX_DIRECTIONS,
-    ZONE_COLORS
+    INIT_NUM_CITIES,
+    MIN_CITY_DISTANCE
 )
-
-logger = logging.getLogger(__name__)
 
 
 class CityInitializer:
-    @staticmethod
-    def create_single_cell_city_inplace(tiles: dict,
-                                        city_id: int,
-                                        center_hex: HexObject
-                                        ) -> Optional[City]:
-        tile = tiles.get(center_hex)
-        if tile is None or not tile.is_buildable or tile.city_id is not None:
-            return None
+    @classmethod
+    def generate_cities(cls,
+                        tiles: dict
+                        ) -> list:
+        from nodos.world.cities import CityBuilder
 
-        city = City(id_num=city_id, center=center_hex)
-        city.districts = {center_hex: 'center'}
+        buildable_hexes = [h for h, t in tiles.items() if t.is_buildable]
 
-        tile.city_id = city_id
-        tile.zone_type = 'center'
-        tile.zone_color = ZONE_COLORS['center']
+        num_seeds = min(INIT_NUM_CITIES, len(buildable_hexes))
+        if num_seeds == 0:
+            return list()
 
-        return city
+        seed_hexes = cls._select_spread_seeds(
+            buildable_hexes=buildable_hexes,
+            min_distance=MIN_CITY_DISTANCE
+        )
 
-    @staticmethod
-    def create_expanded_city_inplace(tiles: dict,
-                                     city_id: int,
-                                     center_hex: HexObject
-                                     ) -> Optional[City]:
-        tile = tiles.get(center_hex)
-        if tile is None or not tile.is_buildable or tile.city_id is not None:
-            return None
+        cities: list = list()
+        for i, center_hex in enumerate(seed_hexes, start=1):
+            city = CityBuilder.create_expanded_city_inplace(
+                tiles=tiles,
+                city_id=i,
+                center_hex=center_hex
+            )
+            if city is not None:
+                cities.append(city)
 
-        city = City(id_num=city_id, center=center_hex)
+        return cities
 
-        frontier: list[HexObject] = [center_hex]
-        visited: set[HexObject] = {center_hex}
+    @classmethod
+    def _select_spread_seeds(cls,
+                             buildable_hexes: list[HexObject],
+                             min_distance: int,
+                             candidates: Optional[list[HexObject]] = None
+                             ) -> list[HexObject]:
+        if candidates is None:
+            candidates = buildable_hexes.copy()
+            random.shuffle(candidates)
 
-        tile.city_id = city_id
-        tile.zone_type = 'center'
-        tile.zone_color = ZONE_COLORS['center']
+        selected_seeds: list[HexObject] = list()
+        for candidate in candidates:
+            if len(selected_seeds) >= INIT_NUM_CITIES:
+                break
 
-        for distance_step in range(1, CITY_EXPANSION_STEPS + 1):
-            next_frontier = list()
-            for current_hex in frontier:
-                for dq, dr in HEX_DIRECTIONS:
-                    neighbor = HexObject(q=current_hex.q + dq, r=current_hex.r + dr)
-                    neighbor_tile = tiles.get(neighbor)
-                    if (
-                        neighbor_tile is not None and
-                        neighbor_tile.is_buildable and
-                        neighbor not in visited and
-                        neighbor_tile.city_id is None
-                    ):
-                        visited.add(neighbor)
-                        next_frontier.append(neighbor)
+            is_valid_location: bool = True
+            for seed in selected_seeds:
+                if candidate.distance_to(other=seed) < min_distance:
+                    is_valid_location = False
+                    break
 
-                        zone_type = CityInitializer._determine_directional_zone(
-                            city=city,
-                            hex_obj=neighbor,
-                            distance=distance_step
-                        )
-                        city.districts[neighbor] = zone_type
+            if is_valid_location:
+                selected_seeds.append(candidate)
 
-                        neighbor_tile.city_id = city_id
-                        neighbor_tile.zone_type = zone_type
-                        neighbor_tile.zone_color = ZONE_COLORS[zone_type]
+        if len(selected_seeds) < INIT_NUM_CITIES and min_distance > CITY_EXPANSION_STEPS:
+            return cls._select_spread_seeds(
+                buildable_hexes=buildable_hexes,
+                min_distance=min_distance - 1,
+                candidates=candidates
+            )
 
-            frontier = next_frontier
-
-        return city
-
-    @staticmethod
-    def _determine_directional_zone(city: City,
-                                    hex_obj: HexObject,
-                                    distance: int
-                                    ) -> str:
-        if distance == 1:
-            return 'commercial'
-
-        dq = hex_obj.q - city.center.q
-        dr = hex_obj.r - city.center.r
-
-        dx = dq + dr / 2.0
-        dy = dr * (math.sqrt(3.0) / 2.0)
-
-        length = math.hypot(dx, dy)
-        norm_x = dx / length
-        norm_y = dy / length
-
-        target_x = math.cos(city.industrial_angle)
-        target_y = math.sin(city.industrial_angle)
-
-        dot_product = norm_x * target_x + norm_y * target_y
-
-        if dot_product > 0.5:
-            return 'industrial'
-        elif dot_product >= 0.0:
-            return 'commercial'
-        else:
-            return 'residential'
+        return selected_seeds

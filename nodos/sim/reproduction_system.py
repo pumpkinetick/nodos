@@ -5,7 +5,7 @@ import random
 from typing import TYPE_CHECKING, Any
 
 from nodos.core.hex_math import HexObject
-from nodos.world.cities import CityInitializer
+from nodos.world.cities import CityBuilder
 
 from nodos.config import (
     DEFAULT_DEVELOPMENT,
@@ -58,7 +58,7 @@ class ReproductionSystem:
         child_state['resources'] = child_transfer_res
         child_state['development'] = DEFAULT_DEVELOPMENT
 
-        child_city = CityInitializer.create_expanded_city_inplace(
+        child_city = CityBuilder.create_expanded_city_inplace(
             tiles=self.simulation.world.tiles,
             city_id=self._next_city_id(),
             center_hex=offspring_center
