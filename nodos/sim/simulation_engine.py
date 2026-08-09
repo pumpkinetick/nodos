@@ -19,7 +19,7 @@ from nodos.config import (
 logger = logging.getLogger(__name__)
 
 
-class Simulation:
+class SimulationEngine:
     def __init__(self,
                  world: Optional[WorldMap] = None,
                  tick_length: float = 1.0
@@ -41,7 +41,7 @@ class Simulation:
         self.reproduction = ReproductionSystem(simulation=self)
 
         logger.info(
-            'Simulation initialized: %d cities', len(self.world.cities)
+            'SimulationEngine initialized: %d cities', len(self.world.cities)
         )
 
     @cached_property

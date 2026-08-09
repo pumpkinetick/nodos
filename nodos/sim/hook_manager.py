@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Callable, Optional
 if TYPE_CHECKING:
     from nodos.core.hex_math import HexObject
     from nodos.render import SimulationWindow
-    from nodos.sim import Simulation
+    from nodos.sim import SimulationEngine
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ class HookManager:
         self._city_removed_hook: Optional[Callable[..., None]] = None
 
     def attach(self,
-               simulation: Simulation
+               simulation: SimulationEngine
                ):
         if self._city_added_hook is None:
             self._city_added_hook = self._build_city_added_hook()
@@ -37,7 +37,7 @@ class HookManager:
         )
 
     def detach(self,
-               simulation: Simulation
+               simulation: SimulationEngine
                ):
         if self._city_added_hook is not None:
             simulation.unregister_hook(
@@ -54,7 +54,7 @@ class HookManager:
 
     def _build_city_added_hook(self) -> Callable[..., None]:
         def _on_city_added(
-            sim_obj: Simulation,
+            sim_obj: SimulationEngine,
             city: object,
             state: object,
         ):
@@ -67,7 +67,7 @@ class HookManager:
 
     def _build_city_removed_hook(self) -> Callable[..., None]:
         def _on_city_removed(
-            sim_obj: Simulation,
+            sim_obj: SimulationEngine,
             city_id: int,
             removed_hexes: list[HexObject],
         ):

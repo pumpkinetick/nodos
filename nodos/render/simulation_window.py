@@ -8,7 +8,7 @@ from nodos.core.hex_math import HexLayout, HexObject
 from nodos.render import CameraController
 from nodos.render import SimulationDrawer
 from nodos.sim import HookManager
-from nodos.sim import Simulation
+from nodos.sim import SimulationEngine
 from nodos.world.map import WorldMap
 
 logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ class SimulationWindow(arcade.Window):
         self.layout: HexLayout = HexLayout()
         self.world_map: WorldMap = WorldMap()
 
-        self.sim: Simulation = Simulation(world=self.world_map)
+        self.sim: SimulationEngine = SimulationEngine(world=self.world_map)
         self._sim_time_acc: float = 0.0
 
         self.camera_controller: CameraController = CameraController()
@@ -202,7 +202,7 @@ class SimulationWindow(arcade.Window):
                 self.sim.tick()
                 self._sim_time_acc -= self.sim.tick_length
         except Exception:
-            logger.exception('Simulation tick error')
+            logger.exception('SimulationEngine tick error')
 
         if getattr(self, '_needs_rebuild', False):
             try:

@@ -19,7 +19,7 @@ from nodos.config import (
 )
 
 if TYPE_CHECKING:
-    from nodos.sim import Simulation
+    from nodos.sim import SimulationEngine
     from nodos.world.cities import City
 
 logger = logging.getLogger(__name__)
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 class ReproductionSystem:
     def __init__(self,
-                 simulation: Simulation
+                 simulation: SimulationEngine
                  ):
         self.simulation = simulation
 
