@@ -69,7 +69,7 @@ class ReproductionSystem:
 
         self.simulation.add_city(city=child_city, state=child_state)
 
-        self.simulation.world.infra_graph.connect_cities(
+        self.simulation.world.road_network.connect_cities(
             city_a_center=city.center,
             city_b_center=child_city.center,
             tiles=self.simulation.world.tiles

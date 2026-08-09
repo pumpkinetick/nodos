@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from nodos.world.cities import City
 
 
-class InfrastructureGraph:
+class RoadNetwork:
     def __init__(self):
         self.graph: nx.Graph = nx.Graph()
 

@@ -230,7 +230,7 @@ class HexBatchDrawer:
     def bake_roads(self,
                    world_map: WorldMap
                    ):
-        for h1, h2 in world_map.infra_graph.road_edges:
+        for h1, h2 in world_map.road_network.road_edges:
             p1_x, p1_y = self.layout.hex_to_pixel(hex_obj=h1)
             p2_x, p2_y = self.layout.hex_to_pixel(hex_obj=h2)
             self.road_shapes.append(

@@ -1,7 +1,7 @@
 from functools import cached_property
 from typing import TYPE_CHECKING
 
-from nodos.core.graph import InfrastructureGraph
+from nodos.core import RoadNetwork
 from nodos.core.hex_math import HexObject
 from nodos.world.cities import CityBuilderEngine
 from nodos.world.map import HexTile
@@ -26,12 +26,12 @@ class WorldMap:
 
         self.terrain_gen: TerrainGenerator = TerrainGenerator()
         self.city_engine: CityBuilderEngine = CityBuilderEngine()
-        self.infra_graph: InfrastructureGraph = InfrastructureGraph()
+        self.road_network: RoadNetwork = RoadNetwork()
 
         cities_list = self.city_engine.generate_cities(tiles=self.tiles)
         self.cities: dict[int, City] = {c.id_num: c for c in cities_list}
 
-        self.infra_graph.build_regional_network(tiles=self.tiles, cities=cities_list)
+        self.road_network.build_regional_network(tiles=self.tiles, cities=cities_list)
 
     @cached_property
     def tiles(self) -> dict[HexObject, HexTile]:

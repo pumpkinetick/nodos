@@ -224,7 +224,7 @@ class Simulation:
 
         try:
             if city is not None and hasattr(city, 'center'):
-                self.world.infra_graph.remove_city_connections(center=city.center)
+                self.world.road_network.remove_city_connections(center=city.center)
         except Exception:
             logger.exception('Error removing infrastructure edges for city %s', city_id)
 

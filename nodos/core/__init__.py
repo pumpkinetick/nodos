@@ -1,5 +1,5 @@
-from .graph import InfrastructureGraph
+from .road_network import RoadNetwork
 
 __all__ = [
-    'InfrastructureGraph'
+    'RoadNetwork'
 ]
