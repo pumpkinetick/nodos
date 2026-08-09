@@ -1,9 +1,9 @@
 from .camera_controller import CameraController
-from .drawer import HexBatchDrawer
+from .simulation_drawer import SimulationDrawer
 from .window import Window
 
 __all__ = [
     'CameraController',
-    'HexBatchDrawer',
+    'SimulationDrawer',
     'Window'
 ]

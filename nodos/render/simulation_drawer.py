@@ -20,7 +20,7 @@ if TYPE_CHECKING:
     from nodos.world.map import HexTile, WorldMap
 
 
-class HexBatchDrawer:
+class SimulationDrawer:
     def __init__(self,
                  layout: HexLayout
                  ):

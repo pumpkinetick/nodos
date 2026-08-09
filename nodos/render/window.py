@@ -6,7 +6,7 @@ from arcade.shape_list import ShapeElementList
 
 from nodos.core.hex_math import HexLayout, HexObject
 from nodos.render import CameraController
-from nodos.render import HexBatchDrawer
+from nodos.render import SimulationDrawer
 from nodos.sim import Simulation
 from nodos.sim import SimulationWindowHooks
 from nodos.world.map import WorldMap
@@ -39,7 +39,7 @@ class Window(arcade.Window):
 
         self.gui_camera: arcade.Camera2D = arcade.Camera2D()
 
-        self.drawer: HexBatchDrawer = HexBatchDrawer(layout=self.layout)
+        self.drawer: SimulationDrawer = SimulationDrawer(layout=self.layout)
         self.drawer.build_geometry(world_map=self.world_map)
 
         self._needs_rebuild: bool = False
