@@ -12,6 +12,7 @@ from nodos.config import (
     DEFAULT_DEVELOPMENT,
     DEFAULT_HAPPINESS,
     DEFAULT_POPULATION,
+    DEFAULT_REPRODUCTION_COOLDOWN,
     DEFAULT_RESOURCES
 )
 
@@ -57,7 +58,7 @@ class Simulation:
             'happiness': DEFAULT_HAPPINESS,
             'resources': DEFAULT_RESOURCES,
             'development': DEFAULT_DEVELOPMENT,
-            'reproduction_cooldown': 0
+            'reproduction_cooldown': DEFAULT_REPRODUCTION_COOLDOWN
         }
 
     def register_hook(self,
