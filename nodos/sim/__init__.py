@@ -1,5 +1,5 @@
 from .hook_manager import HookManager
-from .reproduction import ReproductionSystem
+from .reproduction_system import ReproductionSystem
 from .simulation import Simulation
 
 __all__ = [
