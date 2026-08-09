@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class SimulationWindowHooks:
+class HookManager:
     def __init__(self,
                  window: SimulationWindow
                  ):

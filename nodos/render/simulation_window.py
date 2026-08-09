@@ -7,8 +7,8 @@ from arcade.shape_list import ShapeElementList
 from nodos.core.hex_math import HexLayout, HexObject
 from nodos.render import CameraController
 from nodos.render import SimulationDrawer
+from nodos.sim import HookManager
 from nodos.sim import Simulation
-from nodos.sim import SimulationWindowHooks
 from nodos.world.map import WorldMap
 
 logger = logging.getLogger(__name__)
@@ -46,7 +46,7 @@ class SimulationWindow(arcade.Window):
         self._removed_hexes_acc: list[HexObject] = list()
 
         try:
-            self.sim_hooks = SimulationWindowHooks(window=self)
+            self.sim_hooks = HookManager(window=self)
             self.sim_hooks.attach(simulation=self.sim)
         except Exception:
             logger.exception('Failed registering city_removed hook')
