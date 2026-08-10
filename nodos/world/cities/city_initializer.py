@@ -6,7 +6,7 @@ from nodos.core.hex_math import HexObject
 from nodos.config import (
     CITY_EXPANSION_STEPS,
     INIT_NUM_CITIES,
-    MIN_CITY_DISTANCE
+    MIN_INIT_CITY_DISTANCE
 )
 
 
@@ -25,7 +25,7 @@ class CityInitializer:
 
         seed_hexes = cls._select_spread_seeds(
             buildable_hexes=buildable_hexes,
-            min_distance=MIN_CITY_DISTANCE
+            min_distance=MIN_INIT_CITY_DISTANCE
         )
 
         cities: list = list()
