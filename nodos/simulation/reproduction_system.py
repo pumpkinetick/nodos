@@ -2,18 +2,19 @@ from __future__ import annotations
 
 import logging
 import random
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Union
 
 from nodos.core.hex_math import HexObject
 from nodos.world.cities import CityBuilder
 
 from nodos.config import (
+    CITY_EXPANSION_STEPS,
     DEFAULT_DEVELOPMENT,
     DEFAULT_HAPPINESS,
     DEFAULT_POPULATION,
     DEFAULT_REPRODUCTION_COOLDOWN,
     DEFAULT_RESOURCES,
-    HEX_DIRECTIONS,
+    MIN_CHILD_CITY_DISTANCE,
     REPRODUCTION_RESOURCE_COST,
     REPRODUCTION_THRESHOLD
 )
@@ -61,7 +62,8 @@ class ReproductionSystem:
         child_city = CityBuilder.create_expanded_city_inplace(
             tiles=self.simulation.world.tiles,
             city_id=self._next_city_id(),
-            center_hex=offspring_center
+            center_hex=offspring_center,
+            parent_color=city.color
         )
 
         if child_city is None:
@@ -88,23 +90,37 @@ class ReproductionSystem:
         )
 
     def _find_reproduction_hex(self,
-                               city: City
-                               ) -> HexObject | None:
-        if not hasattr(city, 'districts'):
-            return None
+                               city: City,
+                               min_distance: int = MIN_CHILD_CITY_DISTANCE
+                               ) -> Union[HexObject, None]:
+        potential_hexes = [
+            h for h, t in self.simulation.world.tiles.items()
+            if t.is_buildable and getattr(t, 'city_id', None) is None
+        ]
 
-        candidate_hexes: list[HexObject] = list()
-        for hex_obj in list(city.districts.keys()):
-            for dq, dr in HEX_DIRECTIONS:
-                candidate = HexObject(q=hex_obj.q + dq, r=hex_obj.r + dr)
-                tile = self.simulation.world.tiles.get(candidate)
-                if tile and tile.is_buildable and getattr(tile, 'city_id', None) is None:
-                    candidate_hexes.append(candidate)
+        valid_candidates: list[HexObject] = list()
+        for candidate in potential_hexes:
+            if candidate.distance_to(other=city.center) < min_distance:
+                continue
 
-        if not candidate_hexes:
-            return None
+            is_valid: bool = True
+            for other_city in self.simulation.world.cities.values():
+                if other_city == city:
+                    continue
+                if candidate.distance_to(other=other_city.center) < min_distance:
+                    is_valid = False
+                    break
 
-        return random.choice(candidate_hexes)
+            if is_valid:
+                valid_candidates.append(candidate)
+
+        if valid_candidates:
+            return random.choice(seq=valid_candidates)
+
+        if min_distance > CITY_EXPANSION_STEPS:
+            return self._find_reproduction_hex(city=city, min_distance=min_distance - 1)
+
+        return None
 
     def _next_city_id(self) -> int:
         existing_ids = [cid for cid in self.simulation.world.cities.keys() if isinstance(cid, int)]

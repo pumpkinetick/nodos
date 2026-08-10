@@ -1,6 +1,6 @@
 import logging
 import math
-from typing import Optional
+from typing import Optional, Union
 
 from nodos.core.hex_math import HexObject
 from nodos.world.cities import City
@@ -18,13 +18,14 @@ class CityBuilder:
     @staticmethod
     def create_single_cell_city_inplace(tiles: dict,
                                         city_id: int,
-                                        center_hex: HexObject
-                                        ) -> Optional[City]:
+                                        center_hex: HexObject,
+                                        parent_color: Optional[tuple[int, int, int, int]] = None
+                                        ) -> Union[City, None]:
         tile = tiles.get(center_hex)
         if tile is None or not tile.is_buildable or tile.city_id is not None:
             return None
 
-        city = City(id_num=city_id, center=center_hex)
+        city = City(id_num=city_id, center=center_hex, parent_color=parent_color)
         city.districts = {center_hex: 'center'}
 
         tile.city_id = city_id
@@ -36,13 +37,14 @@ class CityBuilder:
     @staticmethod
     def create_expanded_city_inplace(tiles: dict,
                                      city_id: int,
-                                     center_hex: HexObject
-                                     ) -> Optional[City]:
+                                     center_hex: HexObject,
+                                     parent_color: Optional[tuple[int, int, int, int]] = None
+                                     ) -> Union[City, None]:
         tile = tiles.get(center_hex)
         if tile is None or not tile.is_buildable or tile.city_id is not None:
             return None
 
-        city = City(id_num=city_id, center=center_hex)
+        city = City(id_num=city_id, center=center_hex, parent_color=parent_color)
 
         frontier: list[HexObject] = [center_hex]
         visited: set[HexObject] = {center_hex}
