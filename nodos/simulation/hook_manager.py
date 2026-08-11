@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Callable, Optional
+from typing import TYPE_CHECKING, Any, Callable, Optional
+
+from nodos.world.cities import City
 
 if TYPE_CHECKING:
     from nodos.core.hex_math import HexObject
@@ -55,11 +57,12 @@ class HookManager:
     def _build_city_added_hook(self) -> Callable[..., None]:
         def _on_city_added(
             sim_obj: SimulationEngine,
-            city: object,
-            state: object,
+            city: City,
+            state: dict[str, Any]
         ):
             try:
-               self.window.queue_city_creation_updates()
+               added_hexes = list(getattr(city, 'districts', dict()).keys())
+               self.window.queue_city_creation_updates(added_hexes=added_hexes)
             except Exception:
                logger.exception('Error in city_added handler')
 
@@ -69,7 +72,7 @@ class HookManager:
         def _on_city_removed(
             sim_obj: SimulationEngine,
             city_id: int,
-            removed_hexes: list[HexObject],
+            removed_hexes: list[HexObject]
         ):
             try:
                self.window.queue_city_removal_updates(removed_hexes=removed_hexes)

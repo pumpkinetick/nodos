@@ -32,11 +32,34 @@ class BorderLayer(RenderLayer):
                     for s in b_shapes:
                         self.shapes.append(s)
 
+    def update_tiles(self,
+                     hexes: list[HexObject],
+                     world_map: WorldMap
+                     ):
+        for h in hexes:
+            tile = world_map.get_tile(hex_obj=h)
+            if tile and tile.city_id is not None:
+                corners = self.layout.polygon_corners(hex_obj=h)
+                b_shapes = self._bake_tile_borders(
+                    hex_obj=h, corners=corners, tile=tile, world_map=world_map
+                )
+                if b_shapes:
+                    self._tile_map[h] = b_shapes
+                else:
+                    self._tile_map.pop(h, None)
+            else:
+                self._tile_map.pop(h, None)
+
+        self._rebuild_list()
+
     def remove_tiles(self, hexes: list[HexObject]):
         for h in hexes:
             self._tile_map.pop(h, None)
-        self.shapes = ShapeElementList()
 
+        self._rebuild_list()
+
+    def _rebuild_list(self):
+        self.shapes = ShapeElementList()
         for shapes in self._tile_map.values():
             for s in shapes:
                 self.shapes.append(s)

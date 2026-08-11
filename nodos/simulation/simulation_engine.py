@@ -149,7 +149,7 @@ class SimulationEngine:
                  ):
         city_state = state if state is not None else self.default_city_state()
         self.world.cities[city.id_num] = city
-        self.status_manager.set_state(city.id_num, city_state)
+        self.status_manager.set_state(city_id=city.id_num, state=city_state)
         self._notify_city_added(city=city, state=city_state)
 
     def remove_city(self,

@@ -1,3 +1,5 @@
+from typing import Optional
+
 from arcade.shape_list import Shape, ShapeElementList
 
 from nodos.core.hex_math import HexLayout, HexObject
@@ -30,9 +32,24 @@ class ZoningLayer(RenderLayer):
                     hex_obj: HexObject,
                     tile: HexTile
                     ):
-        corners = self.layout.polygon_corners(hex_obj=hex_obj)
-        self._tile_map[hex_obj] = self._bake_zoning_tile(corners=corners, tile=tile)
+        self.update_tiles(hexes=[hex_obj], world_map=None, tile_override=tile)
 
+    def update_tiles(self,
+                     hexes: list[HexObject],
+                     world_map: Optional[WorldMap],
+                     tile_override: Optional[HexTile] = None
+                     ):
+        for h in hexes:
+            tile = tile_override or world_map.get_tile(hex_obj=h)
+            if tile:
+                corners = self.layout.polygon_corners(hex_obj=h)
+                self._tile_map[h] = self._bake_zoning_tile(corners=corners, tile=tile)
+            else:
+                self._tile_map.pop(h, None)
+
+        self._rebuild_list()
+
+    def _rebuild_list(self):
         self.shapes = ShapeElementList()
         for shapes in self._tile_map.values():
             for s in shapes:

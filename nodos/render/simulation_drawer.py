@@ -24,6 +24,14 @@ class SimulationDrawer:
         self.road_layer.build(world_map=world_map)
         self.border_layer.build(world_map=world_map)
 
+    def update_city_tiles(self,
+                          hexes: list[HexObject],
+                          world_map: WorldMap
+                          ):
+        self.terrain_layer.update_tiles(hexes=hexes, world_map=world_map)
+        self.zoning_layer.update_tiles(hexes=hexes, world_map=world_map)
+        self.border_layer.update_tiles(hexes=hexes, world_map=world_map)
+
     def remove_tiles(self,
                      hexes: list[HexObject],
                      world_map: WorldMap

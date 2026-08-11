@@ -36,6 +36,7 @@ class SimulationWindow(arcade.Window):
         self.input_handler = InputHandler(window=self)
 
         self._needs_rebuild = False
+        self._added_hexes_acc: list[HexObject] = list()
         self._removed_hexes_acc: list[HexObject] = list()
 
         try:
@@ -47,9 +48,10 @@ class SimulationWindow(arcade.Window):
         self.view_mode = 'terrain'
         self.hovered_hex: Optional[HexObject] = None
 
-    def queue_city_creation_updates(self):
-        self._removed_hexes_acc = list()
-        self._needs_rebuild = True
+    def queue_city_creation_updates(self, added_hexes: list[HexObject]):
+        if added_hexes:
+            self._added_hexes_acc.extend(added_hexes)
+            self._needs_rebuild = True
 
     def queue_city_removal_updates(self, removed_hexes: list[HexObject]):
         if removed_hexes:
@@ -92,12 +94,14 @@ class SimulationWindow(arcade.Window):
 
     def _handle_rebuild(self):
         try:
+            if self._added_hexes_acc:
+                self.drawer.update_city_tiles(hexes=self._added_hexes_acc, world_map=self.world_map)
+                self.drawer.bake_roads(world_map=self.world_map)
+                self._added_hexes_acc = list()
             if self._removed_hexes_acc:
                 self.drawer.remove_tiles(hexes=self._removed_hexes_acc, world_map=self.world_map)
                 self.drawer.bake_roads(world_map=self.world_map)
                 self._removed_hexes_acc = list()
-            else:
-                self.drawer.build_geometry(world_map=self.world_map)
         except Exception:
             logger.exception('Error rebuilding geometry')
             self.drawer.build_geometry(world_map=self.world_map)
