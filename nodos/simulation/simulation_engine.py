@@ -28,7 +28,7 @@ class SimulationEngine:
             'city_removed': list()
         }
 
-        self.reproduction = ReproductionSystem(simulation=self)
+        self.reproduction = ReproductionSystem(engine=self)
 
         logger.info(
             'SimulationEngine initialized: %d cities', len(self.world.cities)
@@ -48,7 +48,7 @@ class SimulationEngine:
 
     @property
     def city_states(self) -> dict[int, dict[str, Any]]:
-        return self.status_manager.city_states
+        return self.status_manager._city_states
 
     @staticmethod
     def default_city_state() -> dict[str, Any]:
@@ -127,7 +127,7 @@ class SimulationEngine:
             steps: int
             ):
         logger.info(
-            'Running simulation for %d steps', steps
+            'Running engine for %d steps', steps
         )
         for _ in range(steps):
             self.tick()

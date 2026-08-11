@@ -24,10 +24,11 @@ class CityStatusManager:
                  engine: SimulationEngine
                  ):
         self.engine = engine
-        self.city_states: dict[int, dict[str, Any]] = dict()
+
+        self._city_states: dict[int, dict[str, Any]] = dict()
 
     def initialize_city_states(self):
-        self.city_states = {
+        self._city_states = {
             cid: self.default_city_state()
             for cid in self.engine.world.cities.keys()
         }
@@ -45,18 +46,18 @@ class CityStatusManager:
     def get_state(self,
                   city_id: int
                   ) -> Optional[dict[str, Any]]:
-        return self.city_states.get(city_id)
+        return self._city_states.get(city_id)
 
     def set_state(self,
                   city_id: int,
                   state: dict[str, Any]
                   ):
-        self.city_states[city_id] = state
+        self._city_states[city_id] = state
 
     def remove_state(self,
                      city_id: int
                      ):
-        self.city_states.pop(city_id, None)
+        self._city_states.pop(city_id, None)
 
     def apply_metric_updates(self,
                              city: City,

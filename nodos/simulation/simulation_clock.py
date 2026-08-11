@@ -10,8 +10,8 @@ class SimulationClock:
                  start_time: float = 0.0
                  ):
         self.tick_length = tick_length
-        self.current_tick: int = start_tick
-        self.time: float = start_time
+        self.current_tick = start_tick
+        self.time = start_time
 
     def tick(self):
         self.current_tick += 1

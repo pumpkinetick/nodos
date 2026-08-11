@@ -18,37 +18,38 @@ class HookManager:
                  window: SimulationWindow
                  ):
         self.window = window
+
         self._city_added_hook: Optional[Callable[..., None]] = None
         self._city_removed_hook: Optional[Callable[..., None]] = None
 
     def attach(self,
-               simulation: SimulationEngine
+               engine: SimulationEngine
                ):
         if self._city_added_hook is None:
             self._city_added_hook = self._build_city_added_hook()
         if self._city_removed_hook is None:
             self._city_removed_hook = self._build_city_removed_hook()
 
-        simulation.register_hook(
+        engine.register_hook(
             hook_name='city_added',
             func=self._city_added_hook
         )
-        simulation.register_hook(
+        engine.register_hook(
             hook_name='city_removed',
             func=self._city_removed_hook
         )
 
     def detach(self,
-               simulation: SimulationEngine
+               engine: SimulationEngine
                ):
         if self._city_added_hook is not None:
-            simulation.unregister_hook(
+            engine.unregister_hook(
                hook_name='city_added',
                func=self._city_added_hook
             )
             self._city_added_hook = None
         if self._city_removed_hook is not None:
-            simulation.unregister_hook(
+            engine.unregister_hook(
                hook_name='city_removed',
                func=self._city_removed_hook
             )

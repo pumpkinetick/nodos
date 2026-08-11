@@ -28,9 +28,9 @@ logger = logging.getLogger(__name__)
 
 class ReproductionSystem:
     def __init__(self,
-                 simulation: SimulationEngine
+                 engine: SimulationEngine
                  ):
-        self.simulation = simulation
+        self.engine = engine
 
     def try_reproduce(self,
                       city: City,
@@ -53,14 +53,14 @@ class ReproductionSystem:
         child_transfer_pop = min(pop * 0.1, pop)
         child_transfer_res = min(res * 0.1, res)
 
-        child_state = self.simulation.default_city_state()
+        child_state = self.engine.default_city_state()
         child_state['population'] = child_transfer_pop
         child_state['happiness'] = DEFAULT_HAPPINESS
         child_state['resources'] = child_transfer_res
         child_state['development'] = DEFAULT_DEVELOPMENT
 
         child_city = CityBuilder.create_expanded_city_inplace(
-            tiles=self.simulation.world.tiles,
+            tiles=self.engine.world.tiles,
             city_id=self._next_city_id(),
             center_hex=offspring_center,
             parent_color=city.color
@@ -69,12 +69,12 @@ class ReproductionSystem:
         if child_city is None:
             return
 
-        self.simulation.add_city(city=child_city, state=child_state)
+        self.engine.add_city(city=child_city, state=child_state)
 
-        self.simulation.world.road_network.connect_cities(
+        self.engine.world.road_network.connect_cities(
             city_a_center=city.center,
             city_b_center=child_city.center,
-            tiles=self.simulation.world.tiles
+            tiles=self.engine.world.tiles
         )
 
         state['population'] = max(0.0, pop - child_transfer_pop)
@@ -99,11 +99,11 @@ class ReproductionSystem:
 
         if candidates is None:
             potential_hexes = [
-                h for h, t in self.simulation.world.tiles.items()
+                h for h, t in self.engine.world.tiles.items()
                 if t.is_buildable and getattr(t, 'city_id', None) is None
             ]
 
-            other_cities = [c for c in self.simulation.world.cities.values() if c != city]
+            other_cities = [c for c in self.engine.world.cities.values() if c != city]
             candidates = [
                 h for h in potential_hexes
                 if all(h.distance_to(other=c.center) >= target_distance for c in other_cities)
@@ -126,5 +126,5 @@ class ReproductionSystem:
         )
 
     def _next_city_id(self) -> int:
-        existing_ids = [cid for cid in self.simulation.world.cities.keys() if isinstance(cid, int)]
+        existing_ids = [cid for cid in self.engine.world.cities.keys() if isinstance(cid, int)]
         return max(existing_ids, default=0) + 1

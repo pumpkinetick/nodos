@@ -9,10 +9,10 @@ class HexTile:
                  ):
         self.hex_obj = hex_obj
 
-        self.elevation: float = 0.0
-        self.biome: str = 'water'
-        self.color: tuple[int, int, int, int] = (0, 0, 0, 255)
-        self.is_buildable: bool = False
+        self.elevation = 0.0
+        self.biome = 'water'
+        self.color = (0, 0, 0, 255)
+        self.is_buildable = False
 
         self.city_id: Optional[int] = None
         self.zone_type: Optional[str] = None

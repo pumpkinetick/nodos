@@ -14,7 +14,8 @@ class BorderLayer(RenderLayer):
     def __init__(self, layout: HexLayout):
         self.layout = layout
 
-        self.shapes: ShapeElementList = ShapeElementList()
+        self.shapes = ShapeElementList()
+
         self._tile_map: dict[HexObject, list[Shape]] = dict()
 
     def build(self, world_map: WorldMap):
@@ -75,7 +76,7 @@ class BorderLayer(RenderLayer):
                            ) -> list[Shape]:
         city = world_map.cities[tile.city_id]
 
-        border_list: list = list()
+        border_list: list[Shape] = list()
         for i, (dq, dr) in enumerate(POINTY_TOP_DIRECTIONS):
             neighbor = world_map.get_tile(
                 hex_obj=HexObject(q=hex_obj.q + dq, r=hex_obj.r + dr)

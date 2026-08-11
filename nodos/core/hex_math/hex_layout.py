@@ -22,7 +22,7 @@ class HexLayout:
         self._pixel_cache: dict[HexObject, tuple[float, float]] = dict()
         self._corner_cache: dict[HexObject, list[tuple[float, float]]] = dict()
 
-        self._corner_offsets: list[tuple[float, float]] = [
+        self._corner_offsets = [
             (
                 self.size * math.cos(math.pi / 180.0 * (60 * i + 30)),
                 self.size * math.sin(math.pi / 180.0 * (60 * i + 30))

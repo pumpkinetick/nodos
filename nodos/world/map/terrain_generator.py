@@ -18,7 +18,7 @@ class TerrainGenerator:
                  persistence: float = NOISE_PERSISTENCE,
                  lacunarity: float = NOISE_LACUNARITY
                  ):
-        self.noise: OpenSimplex = OpenSimplex(seed=seed)
+        self.noise = OpenSimplex(seed=seed)
         self.scale = scale
         self.octaves = octaves
         self.persistence = persistence

@@ -19,10 +19,10 @@ class City:
         self.id_num = id_num
         self.center = center
 
-        self.name: str = f'{random.choice(NAME_PREFIXES)}{random.choice(NAME_SUFFIXES)}'
+        self.name = f'{random.choice(NAME_PREFIXES)}{random.choice(NAME_SUFFIXES)}'
 
         if parent_color:
-            delta: int = 20
+            delta = 20
             self.color = (
                 max(50, min(220, parent_color[0] + random.randint(-delta, delta))),
                 max(50, min(220, parent_color[1] + random.randint(-delta, delta))),
@@ -37,5 +37,6 @@ class City:
                 180
             )
 
-        self.industrial_angle: float = random.uniform(a=0.0, b=2.0 * math.pi)
+        self.industrial_angle = random.uniform(a=0.0, b=2.0 * math.pi)
+
         self.districts: dict[HexObject, str] = {center: 'center'}

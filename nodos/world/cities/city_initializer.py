@@ -2,6 +2,7 @@ import random
 from typing import Optional
 
 from nodos.core.hex_math import HexObject
+from nodos.world.cities import City
 
 from nodos.config import (
     CITY_EXPANSION_STEPS,
@@ -14,7 +15,7 @@ class CityInitializer:
     @classmethod
     def generate_cities(cls,
                         tiles: dict
-                        ) -> list:
+                        ) -> list[City]:
         from nodos.world.cities import CityBuilder
 
         buildable_hexes = [h for h, t in tiles.items() if t.is_buildable]
@@ -28,7 +29,7 @@ class CityInitializer:
             min_distance=MIN_INIT_CITY_DISTANCE
         )
 
-        cities: list = list()
+        cities: list[City] = list()
         for i, center_hex in enumerate(seed_hexes, start=1):
             city = CityBuilder.create_expanded_city_inplace(
                 tiles=tiles,
@@ -55,7 +56,7 @@ class CityInitializer:
             if len(selected_seeds) >= INIT_NUM_CITIES:
                 break
 
-            is_valid_location: bool = True
+            is_valid_location = True
             for seed in selected_seeds:
                 if candidate.distance_to(other=seed) < min_distance:
                     is_valid_location = False
