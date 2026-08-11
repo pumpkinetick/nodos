@@ -5,27 +5,35 @@ POINTY_TOP_DIRECTIONS = [
     (0, 1), (-1, 1), (-1, 0), (0, -1), (1, -1), (1, 0)
 ]
 
-# --- Window & Display ---
+############################
+# --- Display Settings --- #
+############################
+
+# Window settings
 SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 800
 WINDOW_TITLE = 'Nodos'
 
-# --- Hex Layout ---
+# Hex layout settings
 HEX_SIZE = 32.0
 ORIGIN_X = 0.0
 ORIGIN_Y = 0.0
+
+###############################
+# --- Simulation Settings --- #
+###############################
+
+# Map settings
 MAP_WIDTH = 100
 MAP_HEIGHT = 100
 
-# --- Terrain Noise Generation ---
+# Terrain generation settings
 NOISE_SEED = 42
 NOISE_SCALE = 1.0 / 30
 NOISE_OCTAVES = 5
 NOISE_PERSISTENCE = 1.0 / 2
 NOISE_LACUNARITY = 2.0
 
-# --- Biome Definitions ---
-# Format: (Upper Elevation Threshold, (R, G, B, A) Color, Is_Buildable, Name)
 BIOMES = [
     (-0.3, (25, 60, 110, 255), False, 'deep_water'),
     (-0.2, (45, 105, 175, 255), False, 'shallow_water'),
@@ -35,13 +43,18 @@ BIOMES = [
     (0.4, (130, 150, 100, 255), True, 'hills'),
     (0.5, (110, 110, 110, 255), False, 'mountains'),
     (float('inf'), (220, 225, 230, 255), False, 'snow')
-]
+] # Format: (Upper Elevation Threshold, (R, G, B, A) Color, Is_Buildable, Name)
 
-# --- Cities & Zoning ---
-INIT_NUM_CITIES = 10
-MIN_CITY_DISTANCE = 20
+# Road graph settings
+ELEVATION_FACTOR = 2.0
+
+# City settings
+INIT_NUM_CITIES = 3
+MIN_INIT_CITY_DISTANCE = 20
+
 CITY_EXPANSION_STEPS = 3
 NUM_NEIGHBORS = 3
+
 ZONE_COLORS = {
     'center': (255, 255, 255, 255),
     'residential': (70, 130, 200, 255),
@@ -51,14 +64,19 @@ ZONE_COLORS = {
 NAME_PREFIXES = ['Oak', 'River', 'Stone', 'Iron', 'Kings', 'Frost', 'Sun', 'Moon', 'Star', 'Wind']
 NAME_SUFFIXES = ['ville', 'town', 'ford', 'bridge', 'gate', 'hold', 'port', 'stead', 'val', 'grad']
 
-# --- Graph Settings ---
-ELEVATION_FACTOR = 2.0
+DEFAULT_POPULATION = 100.0
+DEFAULT_HAPPINESS = 0.1
+DEFAULT_RESOURCES = 100.0
+DEFAULT_DEVELOPMENT = 0.1
 
-# --- Default City State Values ---
-DEFAULT_POPULATION = 100
-DEFAULT_HAPPINESS = 0.0
+MUTATION_RATE = 0.05
+
+DEFAULT_REPRODUCTION_COOLDOWN = 8
+REPRODUCTION_THRESHOLD = 100.0
+REPRODUCTION_POPULATION_COST = 10.0
+REPRODUCTION_RESOURCE_COST = 10.0
+
+MIN_CHILD_CITY_DISTANCE = 10
+MAX_CHILD_CITY_DISTANCE = 20
 
 DEATH_POPULATION_THRESHOLD = 1
-
-DEFAULT_RESOURCES = 100
-DEFAULT_DEVELOPMENT = 0.0
