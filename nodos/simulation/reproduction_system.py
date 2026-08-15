@@ -35,23 +35,28 @@ class ReproductionSystem:
     def try_reproduce(self,
                       city: City,
                       state: dict[str, Any]
-                      ):
+                      ) -> bool:
         cooldown = int(state.get('reproduction_cooldown', 0))
         if cooldown > 0:
-            state['reproduction_cooldown'] = cooldown - 1
-            return
+            logger.debug('City %s is on reproduction cooldown (%d ticks left)',
+                         city.id_num, cooldown)
+            return False
 
         pop = float(state.get('population', DEFAULT_POPULATION))
         res = float(state.get('resources', DEFAULT_RESOURCES))
         if pop < REPRODUCTION_THRESHOLD or res < REPRODUCTION_RESOURCE_COST:
-            return
+            logger.debug('City %s has insufficient population (%.2f < %.2f) or resources (%.2f < %.2f) to reproduce',
+                         city.id_num, pop, REPRODUCTION_THRESHOLD, res, REPRODUCTION_RESOURCE_COST)
+            return False
 
         offspring_center = self._find_reproduction_hex(city=city)
         if offspring_center is None:
-            return
+            logger.debug('Could not find a suitable location for offspring of city %s',
+                         city.id_num)
+            return False
 
-        child_transfer_pop = min(pop * 0.1, pop)
-        child_transfer_res = min(res * 0.1, res)
+        child_transfer_pop = pop * 0.1
+        child_transfer_res = res * 0.1
 
         child_state = self.engine.default_city_state()
         child_state['population'] = child_transfer_pop
@@ -67,7 +72,7 @@ class ReproductionSystem:
         )
 
         if child_city is None:
-            return
+            return False
 
         self.engine.add_city(city=child_city, state=child_state)
 
@@ -81,13 +86,10 @@ class ReproductionSystem:
         state['resources'] = max(0.0, res - child_transfer_res)
         state['reproduction_cooldown'] = DEFAULT_REPRODUCTION_COOLDOWN
 
-        logger.info(
-            'City %s (id=%s) reproduced into %s (id=%s)',
-            getattr(city, 'name', ''),
-            city.id_num,
-            getattr(child_city, 'name', ''),
-            child_city.id_num
-        )
+        logger.info('City %s (id=%s) reproduced into %s (id=%s)',
+                    getattr(city, 'name', ''), city.id_num,
+                    getattr(child_city, 'name', ''), child_city.id_num)
+        return True
 
     def _find_reproduction_hex(self,
                                city: City,

@@ -25,14 +25,18 @@ class SimulationEngine:
             'post_tick': list(),
             'city_tick': list(),
             'city_added': list(),
-            'city_removed': list()
+            'city_removed': list(),
+            'district_added': list(),
+            'district_changed': list(),
+            'district_removed': list()
         }
 
         self.reproduction = ReproductionSystem(engine=self)
 
-        logger.info(
-            'SimulationEngine initialized: %d cities', len(self.world.cities)
-        )
+        from nodos.simulation.city_actions import CityActions
+        self.actions = CityActions(engine=self)
+
+        logger.info('SimulationEngine initialized: %d cities', len(self.world.cities))
 
     @property
     def current_tick(self) -> int:
@@ -48,7 +52,7 @@ class SimulationEngine:
 
     @property
     def city_states(self) -> dict[int, dict[str, Any]]:
-        return self.status_manager._city_states
+        return self.status_manager.city_states
 
     @staticmethod
     def default_city_state() -> dict[str, Any]:
@@ -81,9 +85,7 @@ class SimulationEngine:
                 logger.exception('Error in city_added hook %s', fn)
 
     def tick(self):
-        logger.debug(
-            'Tick %d starting', self.current_tick
-        )
+        logger.debug('Tick %d starting', self.current_tick)
 
         for fn in list(self.hooks['pre_tick']):
             try:
@@ -116,9 +118,7 @@ class SimulationEngine:
 
         self.clock.tick()
 
-        logger.debug(
-            'Tick %d complete (time=%s)', self.current_tick, self.time
-        )
+        logger.debug('Tick %d complete (time=%s)', self.current_tick, self.time)
 
     def step(self):
         self.tick()
@@ -126,9 +126,7 @@ class SimulationEngine:
     def run(self,
             steps: int
             ):
-        logger.info(
-            'Running engine for %d steps', steps
-        )
+        logger.info('Running engine for %d steps', steps)
         for _ in range(steps):
             self.tick()
 
