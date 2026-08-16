@@ -21,32 +21,37 @@ class SimulationWindow(arcade.Window):
         super().__init__(
             width=width, height=height, title=title, resizable=False
         )
-        arcade.set_background_color(arcade.color.CHARCOAL)
+        arcade.set_background_color(color=arcade.color.CHARCOAL)
 
         self.layout = HexLayout()
+
         self.world_map = WorldMap()
-        self.sim = SimulationEngine(world=self.world_map)
-        self._sim_time_acc = 0.0
+
+        self.engine = SimulationEngine(world=self.world_map)
 
         self.camera_controller = CameraController()
+        self.input_handler = InputHandler(window=self)
+        self.interface_renderer = InterfaceRenderer(window=self)
         self.drawer = SimulationDrawer(layout=self.layout)
+
         self.drawer.build_geometry(world_map=self.world_map)
 
-        self.interface_renderer = InterfaceRenderer(window=self)
-        self.input_handler = InputHandler(window=self)
-
-        self._needs_rebuild = False
-        self._added_hexes_acc: list[HexObject] = list()
-        self._removed_hexes_acc: list[HexObject] = list()
-
         try:
-            self.sim_hooks = HookManager(window=self)
-            self.sim_hooks.attach(simulation=self.sim)
+            self.hook_manager = HookManager(window=self)
+            self.hook_manager.attach(engine=self.engine)
         except Exception:
             logger.exception('Failed registering city_removed hook')
 
         self.view_mode = 'terrain'
+
         self.hovered_hex: Optional[HexObject] = None
+
+        self._sim_time_acc = 0.0
+
+        self._added_hexes_acc: list[HexObject] = list()
+        self._removed_hexes_acc: list[HexObject] = list()
+
+        self._needs_rebuild = False
 
     def queue_city_creation_updates(self, added_hexes: list[HexObject]):
         if added_hexes:
@@ -64,7 +69,7 @@ class SimulationWindow(arcade.Window):
         self.drawer.draw_layer(view_mode=self.view_mode)
         self.interface_renderer.draw(
             view_mode=self.view_mode,
-            current_tick=self.sim.current_tick,
+            current_tick=self.engine.current_tick,
             hovered_hex=self.hovered_hex
         )
 
@@ -81,9 +86,9 @@ class SimulationWindow(arcade.Window):
     def on_update(self, delta_time: float):
         self._sim_time_acc += delta_time
         try:
-            while self._sim_time_acc >= self.sim.tick_length:
-                self.sim.tick()
-                self._sim_time_acc -= self.sim.tick_length
+            while self._sim_time_acc >= self.engine.tick_length:
+                self.engine.tick()
+                self._sim_time_acc -= self.engine.tick_length
         except Exception:
             logger.exception('SimulationEngine tick error')
 
@@ -97,11 +102,11 @@ class SimulationWindow(arcade.Window):
             if self._added_hexes_acc:
                 self.drawer.update_city_tiles(hexes=self._added_hexes_acc, world_map=self.world_map)
                 self.drawer.bake_roads(world_map=self.world_map)
-                self._added_hexes_acc = list()
+                self._added_hexes_acc.clear()
             if self._removed_hexes_acc:
                 self.drawer.remove_tiles(hexes=self._removed_hexes_acc, world_map=self.world_map)
                 self.drawer.bake_roads(world_map=self.world_map)
-                self._removed_hexes_acc = list()
+                self._removed_hexes_acc.clear()
         except Exception:
             logger.exception('Error rebuilding geometry')
             self.drawer.build_geometry(world_map=self.world_map)

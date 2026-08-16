@@ -13,7 +13,7 @@ class InterfaceRenderer:
     def __init__(self, window: SimulationWindow):
         self.window = window
 
-        self.gui_camera: arcade.Camera2D = arcade.Camera2D()
+        self.gui_camera = arcade.Camera2D()
 
         self.mode_text_obj = arcade.Text(
             text='',
@@ -61,7 +61,7 @@ class InterfaceRenderer:
             left_lines.append(f'City: {city.name}')
             left_lines.append(f'District: {tile.zone_type.title()}')
 
-            state = self.window.sim.get_city_state(city.id_num)
+            state = self.window.engine.get_city_state(city.id_num)
             if state:
                 pop = float(state.get('population', 0.0))
                 res = float(state.get('resources', 0.0))

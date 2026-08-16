@@ -8,7 +8,7 @@ class HexObject:
                  ):
         self.q = q
         self.r = r
-        self.s: int = -q - r
+        self.s = -q - r
 
     def __eq__(self,
                other: object

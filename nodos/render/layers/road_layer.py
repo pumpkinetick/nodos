@@ -9,7 +9,7 @@ class RoadLayer(RenderLayer):
     def __init__(self, layout: HexLayout):
         self.layout = layout
 
-        self.shapes: ShapeElementList = ShapeElementList()
+        self.shapes = ShapeElementList()
 
     def build(self, world_map: WorldMap):
         self.shapes = ShapeElementList()

@@ -4,6 +4,7 @@ from typing import Optional, Union
 
 from nodos.core.hex_math import HexObject
 from nodos.world.cities import City
+from nodos.world.map import HexTile
 
 from nodos.config import (
     CITY_EXPANSION_STEPS,
@@ -16,11 +17,12 @@ logger = logging.getLogger(__name__)
 
 class CityBuilder:
     @staticmethod
-    def create_single_cell_city_inplace(tiles: dict,
-                                        city_id: int,
-                                        center_hex: HexObject,
-                                        parent_color: Optional[tuple[int, int, int, int]] = None
-                                        ) -> Union[City, None]:
+    def create_city_inplace(tiles: dict[HexObject, HexTile],
+                            city_id: int,
+                            center_hex: HexObject,
+                            diameter: int = CITY_EXPANSION_STEPS,
+                            parent_color: Optional[tuple[int, int, int, int]] = None
+                            ) -> Union[City, None]:
         tile = tiles.get(center_hex)
         if tile is None or not tile.is_buildable or tile.city_id is not None:
             return None
@@ -32,54 +34,37 @@ class CityBuilder:
         tile.zone_type = 'center'
         tile.zone_color = ZONE_COLORS['center']
 
-        return city
+        if diameter > 0:
+            frontier: list[HexObject] = [center_hex]
+            visited: set[HexObject] = {center_hex}
 
-    @staticmethod
-    def create_expanded_city_inplace(tiles: dict,
-                                     city_id: int,
-                                     center_hex: HexObject,
-                                     parent_color: Optional[tuple[int, int, int, int]] = None
-                                     ) -> Union[City, None]:
-        tile = tiles.get(center_hex)
-        if tile is None or not tile.is_buildable or tile.city_id is not None:
-            return None
+            for distance_step in range(1, diameter + 1):
+                next_frontier = list()
+                for current_hex in frontier:
+                    for dq, dr in HEX_DIRECTIONS:
+                        neighbor = HexObject(q=current_hex.q + dq, r=current_hex.r + dr)
+                        neighbor_tile = tiles.get(neighbor)
+                        if (
+                            neighbor_tile is not None and
+                            neighbor_tile.is_buildable and
+                            neighbor not in visited and
+                            neighbor_tile.city_id is None
+                        ):
+                            visited.add(neighbor)
+                            next_frontier.append(neighbor)
 
-        city = City(id_num=city_id, center=center_hex, parent_color=parent_color)
+                            zone_type = CityBuilder._determine_directional_zone(
+                                city=city,
+                                hex_obj=neighbor,
+                                distance=distance_step
+                            )
+                            city.districts[neighbor] = zone_type
 
-        frontier: list[HexObject] = [center_hex]
-        visited: set[HexObject] = {center_hex}
+                            neighbor_tile.city_id = city_id
+                            neighbor_tile.zone_type = zone_type
+                            neighbor_tile.zone_color = ZONE_COLORS[zone_type]
 
-        tile.city_id = city_id
-        tile.zone_type = 'center'
-        tile.zone_color = ZONE_COLORS['center']
-
-        for distance_step in range(1, CITY_EXPANSION_STEPS + 1):
-            next_frontier = list()
-            for current_hex in frontier:
-                for dq, dr in HEX_DIRECTIONS:
-                    neighbor = HexObject(q=current_hex.q + dq, r=current_hex.r + dr)
-                    neighbor_tile = tiles.get(neighbor)
-                    if (
-                        neighbor_tile is not None and
-                        neighbor_tile.is_buildable and
-                        neighbor not in visited and
-                        neighbor_tile.city_id is None
-                    ):
-                        visited.add(neighbor)
-                        next_frontier.append(neighbor)
-
-                        zone_type = CityBuilder._determine_directional_zone(
-                            city=city,
-                            hex_obj=neighbor,
-                            distance=distance_step
-                        )
-                        city.districts[neighbor] = zone_type
-
-                        neighbor_tile.city_id = city_id
-                        neighbor_tile.zone_type = zone_type
-                        neighbor_tile.zone_color = ZONE_COLORS[zone_type]
-
-            frontier = next_frontier
+                frontier = next_frontier
 
         return city
 

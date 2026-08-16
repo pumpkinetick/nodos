@@ -19,7 +19,7 @@ class RoadNetwork:
     def __init__(self):
         self.nav_graph: Optional[nx.Graph] = None
 
-        self.graph: nx.Graph = nx.Graph()
+        self.graph = nx.Graph()
 
         self.road_edges: list[tuple[HexObject, HexObject]] = list()
         self.city_edge_map: dict[HexObject, set[tuple[HexObject, HexObject]]] = dict()

@@ -14,8 +14,9 @@ class TerrainLayer(RenderLayer):
     def __init__(self, layout: HexLayout):
         self.layout = layout
 
-        self.base_shapes: ShapeElementList = ShapeElementList()
-        self.overlay_shapes: ShapeElementList = ShapeElementList()
+        self.base_shapes = ShapeElementList()
+        self.overlay_shapes = ShapeElementList()
+
         self._base_map: dict[HexObject, list[Shape]] = dict()
         self._overlay_map: dict[HexObject, list[Shape]] = dict()
 
