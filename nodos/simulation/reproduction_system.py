@@ -64,7 +64,7 @@ class ReproductionSystem:
         child_state['resources'] = child_transfer_res
         child_state['development'] = DEFAULT_DEVELOPMENT
 
-        child_city = CityBuilder.create_expanded_city_inplace(
+        child_city = CityBuilder.create_city_inplace(
             tiles=self.engine.world.tiles,
             city_id=self._next_city_id(),
             center_hex=offspring_center,

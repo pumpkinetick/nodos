@@ -3,6 +3,7 @@ from typing import Optional
 
 from nodos.core.hex_math import HexObject
 from nodos.world.cities import City
+from nodos.world.map import HexTile
 
 from nodos.config import (
     CITY_EXPANSION_STEPS,
@@ -14,7 +15,7 @@ from nodos.config import (
 class CityInitializer:
     @classmethod
     def generate_cities(cls,
-                        tiles: dict
+                        tiles: dict[HexObject, HexTile]
                         ) -> list[City]:
         from nodos.world.cities import CityBuilder
 
@@ -31,7 +32,7 @@ class CityInitializer:
 
         cities: list[City] = list()
         for i, center_hex in enumerate(seed_hexes, start=1):
-            city = CityBuilder.create_expanded_city_inplace(
+            city = CityBuilder.create_city_inplace(
                 tiles=tiles,
                 city_id=i,
                 center_hex=center_hex
