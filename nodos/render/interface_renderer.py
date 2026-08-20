@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Optional
 if TYPE_CHECKING:
     from nodos.render import SimulationWindow
     from nodos.core.hex_math import HexObject
+    from nodos.world.cities import City
 
 
 class InterfaceRenderer:
@@ -46,7 +47,56 @@ class InterfaceRenderer:
         self.mode_text_obj.draw()
 
         if hovered_hex:
-            self._draw_tooltip(hovered_hex)
+            self._draw_tooltip(hex_obj=hovered_hex)
+
+            tile = self.window.world_map.get_tile(hex_obj=hovered_hex)
+            if tile and tile.city_id is not None and tile.city_id in self.window.world_map.cities:
+                city = self.window.world_map.cities[tile.city_id]
+                self._draw_brain_graph(city=city)
+
+    @staticmethod
+    def _draw_brain_graph(city: City):
+        # Position fixed in bottom-left
+        start_x = 80
+        start_y = 60
+        layer_spacing = 150
+        node_spacing = 20
+        margin_size = 20
+
+        box_width = (len(city.brain.layer_sizes)-1) * layer_spacing + margin_size * 2
+        box_height = (max(city.brain.layer_sizes)-1) * node_spacing + margin_size * 2
+
+        # Background box
+        arcade.draw_rect_filled(
+            rect=arcade.rect.XYWH(
+                x=start_x + box_width / 2, y=start_y + box_height / 2,
+                width=box_width, height=box_height
+            ),
+            color=(0, 0, 0, 150)
+        )
+
+        # Nodes and connections
+        node_positions: list[list[tuple[int, int]]] = list()
+        for i, layer_size in enumerate(city.brain.layer_sizes):
+            x = start_x + margin_size + i * layer_spacing
+            layer_nodes = list()
+            for j in range(layer_size):
+                y = start_y + margin_size + j * node_spacing
+                layer_nodes.append((x, y))
+                arcade.draw_circle_filled(
+                    center_x=x, center_y=y, radius=5, color=arcade.color.WHITE
+                )
+            node_positions.append(layer_nodes)
+
+        # Draw connections
+        for i in range(len(node_positions) - 1):
+            for start_node in node_positions[i]:
+                for end_node in node_positions[i+1]:
+                    arcade.draw_line(
+                        start_x=start_node[0], start_y=start_node[1],
+                        end_x=end_node[0], end_y=end_node[1],
+                        color=(255, 255, 255, 50), line_width=1
+                    )
 
     def _draw_tooltip(self, hex_obj: HexObject):
         tile = self.window.world_map.get_tile(hex_obj=hex_obj)

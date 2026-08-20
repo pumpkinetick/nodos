@@ -19,8 +19,12 @@ class City:
                  center: HexObject,
                  parent_color: Optional[tuple[int, int, int, int]] = None
                  ):
+        from nodos.core.brain import Brain
+
         self.id_num = id_num
         self.center = center
+
+        self.brain = Brain(layer_sizes=[4, 8, 13])
 
         self.name = f'{random.choice(NAME_PREFIXES)}{random.choice(NAME_SUFFIXES)}'
 
