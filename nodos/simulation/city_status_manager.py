@@ -16,6 +16,8 @@ from nodos.config import (
     DEFAULT_POPULATION,
     DEFAULT_REPRODUCTION_COOLDOWN,
     DEFAULT_RESOURCES,
+    DEV_RES_GROWTH_BASE,
+    HAPPY_POP_GROWTH_BASE,
     IND_DEV_BOOST,
     IND_HAPPY_PENALTY,
     IND_RES_PROD,
@@ -86,23 +88,23 @@ class CityStatusManager:
         # 3. Calculate dynamic metrics
         # Capacity and Overcrowding
         pop_max = BASE_POP_CAP + n_res * RES_POP_CAP_BOOST
-        overcrowding_penalty = max(0.0, (pop - pop_max) / pop_max) if pop_max > 0 else 1.0
+        overcrowding_penalty = max(0.0, pop / pop_max - 1.0) if pop_max > 0 else 1.0
 
         # Happiness (affects growth)
         happiness = BASE_HAPPINESS + (n_com * COM_HAPPY_BOOST) - (n_ind * IND_HAPPY_PENALTY) - overcrowding_penalty
-        happiness = max(-0.5, min(0.5, happiness))
+        happiness = max(-1.0, min(1.0, happiness))
 
         # Development (affects resource production efficiency)
         development = BASE_DEVELOPMENT + (n_ind * IND_DEV_BOOST) + (n_com * COM_DEV_BOOST)
+        development = max(-1.0, min(1.0, development))
 
         # 4. Apply updates
-        # Population growth
-        new_pop = max(0.0, pop * (1.0 + happiness))
+        # Population growth (Happiness adds to population scaled by HAPPY_POP_GROWTH_BASE)
+        new_pop = max(0.0, pop + (HAPPY_POP_GROWTH_BASE * happiness))
 
-        # Resource production / consumption
-        res_prod = (n_ind * IND_RES_PROD) + (n_com * pop * COM_RES_PROD)
-        res_cons = pop * POP_CONSUMPTION_RATE
-        res_net = (res_prod - res_cons) * (1.0 + development)
+        # Resource production / consumption and Development influence
+        res_net_base = (n_ind * IND_RES_PROD) + pop * (n_com * COM_RES_PROD - POP_CONSUMPTION_RATE)
+        res_net = res_net_base + (DEV_RES_GROWTH_BASE * development)
         new_res = max(0.0, res + res_net)
 
         # Update state object
