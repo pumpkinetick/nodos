@@ -1,9 +1,7 @@
 from arcade.shape_list import Shape, create_line_strip, create_polygon
 
 
-def darken_color(color,
-                 amount: int
-                 ) -> tuple[int, int, int, int]:
+def darken_color(color: tuple[int, int, int, int], amount: int) -> tuple[int, int, int, int]:
     return max(0, color[0] - amount), max(0, color[1] - amount), max(0, color[2] - amount), 255
 
 

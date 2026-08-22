@@ -181,16 +181,12 @@ class SimulationEngine:
     def step(self):
         self.tick()
 
-    def run(self,
-            steps: int
-            ):
+    def run(self, steps: int):
         logger.info('Running engine for %d steps', steps)
         for _ in range(steps):
             self.tick()
 
-    def get_city_state(self,
-                       city_id: int
-                       ) -> dict[str, Any]:
+    def get_city_state(self, city_id: int) -> dict[str, Any]:
         return self.status_manager.get_state(city_id)
 
     def set_city_state(self,
@@ -208,9 +204,7 @@ class SimulationEngine:
         self.status_manager.set_state(city_id=city.id_num, state=city_state)
         self._notify_city_added(city=city, state=city_state)
 
-    def remove_city(self,
-                    city_id: int
-                    ):
+    def remove_city(self, city_id: int):
         city = self.world.cities.get(city_id)
 
         removed_hexes: list[HexObject] = list()

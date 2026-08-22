@@ -27,9 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 class ReproductionSystem:
-    def __init__(self,
-                 engine: SimulationEngine
-                 ):
+    def __init__(self, engine: SimulationEngine):
         self.engine = engine
 
     def try_reproduce(self,

@@ -31,9 +31,7 @@ logger = logging.getLogger(__name__)
 
 
 class CityStatusManager:
-    def __init__(self,
-                 engine: SimulationEngine
-                 ):
+    def __init__(self, engine: SimulationEngine):
         self.engine = engine
 
         self.city_states: dict[int, dict[str, Any]] = dict()
@@ -54,9 +52,7 @@ class CityStatusManager:
             'reproduction_cooldown': DEFAULT_REPRODUCTION_COOLDOWN
         }
 
-    def get_state(self,
-                  city_id: int
-                  ) -> Optional[dict[str, Any]]:
+    def get_state(self, city_id: int) -> Optional[dict[str, Any]]:
         return self.city_states.get(city_id)
 
     def set_state(self,
@@ -65,9 +61,7 @@ class CityStatusManager:
                   ):
         self.city_states[city_id] = state
 
-    def remove_state(self,
-                     city_id: int
-                     ):
+    def remove_state(self, city_id: int):
         self.city_states.pop(city_id, None)
 
     def apply_metric_updates(self,

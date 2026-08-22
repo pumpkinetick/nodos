@@ -134,10 +134,7 @@ class CityActions:
                     city.name, hex_obj, current_zone, new_zone_type)
         return True
 
-    def demolish_district(self,
-                          city: City,
-                          hex_obj: HexObject
-                          ) -> bool:
+    def demolish_district(self, city: City, hex_obj: HexObject) -> bool:
         if hex_obj not in city.districts:
             logger.debug('Hex %s is not a district of city %s', hex_obj, city.id_num)
             return False

@@ -39,8 +39,6 @@ class CameraController:
             interpolated_zoom = current_zoom + (self.target_zoom - current_zoom) * (self.zoom_speed * delta_time)
             self.world_camera.zoom = interpolated_zoom
 
-    def adjust_zoom_target(self,
-                           scroll_y: float
-                           ):
+    def adjust_zoom_target(self, scroll_y: float):
         zoom_factor = 1.15 if scroll_y > 0 else (1.0 / 1.15)
         self.target_zoom = max(self.min_zoom, min(self.target_zoom * zoom_factor, self.max_zoom))

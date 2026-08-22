@@ -4,9 +4,7 @@ from nodos.core.hex_math import HexObject
 
 
 class HexTile:
-    def __init__(self,
-                 hex_obj: HexObject
-                 ):
+    def __init__(self, hex_obj: HexObject):
         self.hex_obj = hex_obj
 
         self.elevation = 0.0

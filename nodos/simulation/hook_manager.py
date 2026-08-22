@@ -14,9 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class HookManager:
-    def __init__(self,
-                 window: SimulationWindow
-                 ):
+    def __init__(self, window: SimulationWindow):
         self.window = window
 
         self._city_added_hook: Optional[Callable[..., None]] = None
@@ -26,9 +24,7 @@ class HookManager:
         self._district_changed_hook: Optional[Callable[..., None]] = None
         self._district_removed_hook: Optional[Callable[..., None]] = None
 
-    def attach(self,
-               engine: SimulationEngine
-               ):
+    def attach(self, engine: SimulationEngine):
         if self._city_added_hook is None:
             self._city_added_hook = self._build_city_added_hook()
         if self._city_removed_hook is None:
@@ -63,9 +59,7 @@ class HookManager:
             func=self._district_removed_hook
         )
 
-    def detach(self,
-               engine: SimulationEngine
-               ):
+    def detach(self, engine: SimulationEngine):
         if self._city_added_hook is not None:
             engine.unregister_hook(
                hook_name='city_added',

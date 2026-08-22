@@ -1,5 +1,5 @@
 from functools import cached_property
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 from nodos.core import RoadNetwork
 from nodos.core.hex_math import HexObject
@@ -51,7 +51,5 @@ class WorldMap:
                 tiles[hex_obj] = tile
         return tiles
 
-    def get_tile(self,
-                 hex_obj: HexObject
-                 ) -> HexTile | None:
+    def get_tile(self, hex_obj: HexObject) -> Union[HexTile, None]:
         return self.tiles.get(hex_obj)

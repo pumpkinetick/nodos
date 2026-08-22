@@ -14,9 +14,7 @@ from nodos.config import (
 
 class CityInitializer:
     @classmethod
-    def generate_cities(cls,
-                        tiles: dict[HexObject, HexTile]
-                        ) -> list[City]:
+    def generate_cities(cls, tiles: dict[HexObject, HexTile]) -> list[City]:
         from nodos.world.cities import CityBuilder
 
         buildable_hexes = [h for h, t in tiles.items() if t.is_buildable]

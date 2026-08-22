@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-import networkx as nx
 from typing import TYPE_CHECKING, Optional
+
+import networkx as nx
 
 from nodos.core.hex_math import HexObject
 
@@ -66,9 +67,7 @@ class RoadNetwork:
                     tiles=tiles
                 )
 
-    def remove_city_connections(self,
-                                center: HexObject
-                                ):
+    def remove_city_connections(self, center: HexObject):
         owned_edges = self.city_edge_map.pop(center, set())
         if not owned_edges:
             return

@@ -4,6 +4,8 @@ import arcade
 
 from typing import TYPE_CHECKING, Optional
 
+from nodos.core.neural_network import NodeGene
+
 if TYPE_CHECKING:
     from nodos.render import SimulationWindow
     from nodos.core.hex_math import HexObject
@@ -80,9 +82,9 @@ class InterfaceRenderer:
             color=(0, 0, 0, 150)
         )
 
-        node_positions = {}
+        node_positions: dict[int, tuple[int, int]] = dict()
 
-        def draw_layer(nodes, x_offset):
+        def draw_layer(nodes: list[NodeGene], x_offset: int):
             x = start_x + margin_size + x_offset
             for j, node in enumerate(nodes):
                 y = start_y + margin_size + j * node_spacing
@@ -91,18 +93,18 @@ class InterfaceRenderer:
                     center_x=x, center_y=y, radius=5, color=arcade.color.WHITE
                 )
 
-        draw_layer(inputs, 0)
-        draw_layer(hiddens, layer_spacing)
-        draw_layer(outputs, 2 * layer_spacing)
+        draw_layer(nodes=inputs, x_offset=0)
+        draw_layer(nodes=hiddens, x_offset=layer_spacing)
+        draw_layer(nodes=outputs, x_offset=2 * layer_spacing)
 
         # Draw connections
         for c in city.brain.connections:
             if c.enabled and c.in_node in node_positions and c.out_node in node_positions:
                 start_node = node_positions[c.in_node]
                 end_node = node_positions[c.out_node]
-                
+
                 color = (100, 255, 100, 100) if c.weight > 0 else (255, 100, 100, 100)
-                
+
                 arcade.draw_line(
                     start_x=start_node[0], start_y=start_node[1],
                     end_x=end_node[0], end_y=end_node[1],
