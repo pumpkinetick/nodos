@@ -63,8 +63,13 @@ class InterfaceRenderer:
         node_spacing = 20
         margin_size = 20
 
-        box_width = (len(city.brain.layer_sizes)-1) * layer_spacing + margin_size * 2
-        box_height = (max(city.brain.layer_sizes)-1) * node_spacing + margin_size * 2
+        inputs = [n for n in city.brain.nodes.values() if n.type == 'input']
+        hiddens = [n for n in city.brain.nodes.values() if n.type == 'hidden']
+        outputs = [n for n in city.brain.nodes.values() if n.type == 'output']
+
+        box_width = 2 * layer_spacing + margin_size * 2
+        max_nodes = max(len(inputs), len(hiddens), len(outputs))
+        box_height = max(max_nodes - 1, 0) * node_spacing + margin_size * 2
 
         # Background box
         arcade.draw_rect_filled(
@@ -75,28 +80,34 @@ class InterfaceRenderer:
             color=(0, 0, 0, 150)
         )
 
-        # Nodes and connections
-        node_positions: list[list[tuple[int, int]]] = list()
-        for i, layer_size in enumerate(city.brain.layer_sizes):
-            x = start_x + margin_size + i * layer_spacing
-            layer_nodes = list()
-            for j in range(layer_size):
+        node_positions = {}
+
+        def draw_layer(nodes, x_offset):
+            x = start_x + margin_size + x_offset
+            for j, node in enumerate(nodes):
                 y = start_y + margin_size + j * node_spacing
-                layer_nodes.append((x, y))
+                node_positions[node.id] = (x, y)
                 arcade.draw_circle_filled(
                     center_x=x, center_y=y, radius=5, color=arcade.color.WHITE
                 )
-            node_positions.append(layer_nodes)
+
+        draw_layer(inputs, 0)
+        draw_layer(hiddens, layer_spacing)
+        draw_layer(outputs, 2 * layer_spacing)
 
         # Draw connections
-        for i in range(len(node_positions) - 1):
-            for start_node in node_positions[i]:
-                for end_node in node_positions[i+1]:
-                    arcade.draw_line(
-                        start_x=start_node[0], start_y=start_node[1],
-                        end_x=end_node[0], end_y=end_node[1],
-                        color=(255, 255, 255, 50), line_width=1
-                    )
+        for c in city.brain.connections:
+            if c.enabled and c.in_node in node_positions and c.out_node in node_positions:
+                start_node = node_positions[c.in_node]
+                end_node = node_positions[c.out_node]
+                
+                color = (100, 255, 100, 100) if c.weight > 0 else (255, 100, 100, 100)
+                
+                arcade.draw_line(
+                    start_x=start_node[0], start_y=start_node[1],
+                    end_x=end_node[0], end_y=end_node[1],
+                    color=color, line_width=1
+                )
 
     def _draw_tooltip(self, hex_obj: HexObject):
         tile = self.window.world_map.get_tile(hex_obj=hex_obj)

@@ -1,6 +1,6 @@
 import logging
 import math
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 from nodos.core.hex_math import HexObject
 from nodos.world.cities import City
@@ -21,13 +21,14 @@ class CityBuilder:
                             city_id: int,
                             center_hex: HexObject,
                             diameter: int = CITY_EXPANSION_STEPS,
-                            parent_color: Optional[tuple[int, int, int, int]] = None
+                            parent_color: Optional[tuple[int, int, int, int]] = None,
+                            parent_brain: Optional[Any] = None
                             ) -> Union[City, None]:
         tile = tiles.get(center_hex)
         if tile is None or not tile.is_buildable or tile.city_id is not None:
             return None
 
-        city = City(id_num=city_id, center=center_hex, parent_color=parent_color)
+        city = City(id_num=city_id, center=center_hex, parent_color=parent_color, parent_brain=parent_brain)
         city.districts = {center_hex: 'center'}
 
         tile.city_id = city_id

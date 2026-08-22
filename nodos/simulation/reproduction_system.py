@@ -68,7 +68,8 @@ class ReproductionSystem:
             tiles=self.engine.world.tiles,
             city_id=self._next_city_id(),
             center_hex=offspring_center,
-            parent_color=city.color
+            parent_color=city.color,
+            parent_brain=city.brain
         )
 
         if child_city is None:

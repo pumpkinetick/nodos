@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import colorsys
 import math
 import random
-from typing import Optional
+from typing import Any, Optional
 
 import numpy as np
 
@@ -17,16 +19,13 @@ class City:
     def __init__(self,
                  id_num: int,
                  center: HexObject,
-                 parent_color: Optional[tuple[int, int, int, int]] = None
+                 parent_color: Optional[tuple[int, int, int, int]] = None,
+                 parent_brain: Optional[Any] = None
                  ):
-        from nodos.core.brain import Brain
+        from nodos.core.neural_network.brain import Brain
 
         self.id_num = id_num
         self.center = center
-
-        self.brain = Brain(layer_sizes=[4, 8, 13])
-
-        self.name = f'{random.choice(NAME_PREFIXES)}{random.choice(NAME_SUFFIXES)}'
 
         if parent_color:
             self.color = City._get_new_color(parent_color=parent_color)
@@ -37,6 +36,14 @@ class City:
                 random.randint(a=50, b=220),
                 180
             )
+
+        if parent_brain:
+            self.brain = parent_brain.copy()
+            self.brain.mutate()
+        else:
+            self.brain = Brain.create_prescripted(num_inputs=4, num_outputs=13)
+
+        self.name = f'{random.choice(NAME_PREFIXES)}{random.choice(NAME_SUFFIXES)}'
 
         self.industrial_angle = random.uniform(a=0.0, b=2.0 * math.pi)
 
